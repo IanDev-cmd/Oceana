@@ -448,11 +448,20 @@ body[data-shell="pwa"] .tut-replay{
 
 .tut-ask{
   position:fixed; inset:0; z-index:340; display:flex; align-items:center; justify-content:center;
-  background:transparent; opacity:0; transition:opacity .28s ease;
+  background:rgba(6,18,36,.4); opacity:0; transition:opacity .28s ease;
   padding:16px; pointer-events:none;
+  backdrop-filter:blur(18px) saturate(1.05);
+  -webkit-backdrop-filter:blur(18px) saturate(1.05);
 }
 .tut-ask.show{ opacity:1; }
 .tut-ask .tut-launch, .tut-ask .tut-ask-card{ pointer-events:auto; }
+body.tut-launch-on > *:not(.tut-ask):not(.cursor):not(.welcome-ask){
+  filter:blur(14px);
+  pointer-events:none;
+}
+@media (prefers-reduced-motion: reduce){
+  body.tut-launch-on > *:not(.tut-ask):not(.cursor):not(.welcome-ask){ filter:blur(6px); }
+}
 .tut-launch, .tut-step.tpop{
   background:#fff; color:#0d0f0c;
   box-shadow:0 10px 30px rgba(0,0,0,.28), 0 2px 8px rgba(0,0,0,.14);

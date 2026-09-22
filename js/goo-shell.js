@@ -178,6 +178,7 @@
       if (!opts.force && this.stored()) return;
       var existing = document.querySelector('.tut-ask');
       if (existing) {
+        document.body.classList.add('tut-launch-on');
         existing.classList.add('show');
         var nowBtn = existing.querySelector('#tutInstallNow');
         if (nowBtn && deferredPrompt) nowBtn.classList.add('ready');
@@ -230,6 +231,7 @@
           '</div>' +
         '</article>';
       document.body.appendChild(ov);
+      document.body.classList.add('tut-launch-on');
       if (GOO.News && GOO.News.hidePrompt) GOO.News.hidePrompt();
       paintInstallQr(ov.querySelector('#tutQr'), url);
       requestAnimationFrame(function () { ov.classList.add('show'); });
@@ -248,18 +250,28 @@
         if (GOO.promptInstall) GOO.promptInstall();
       });
       ov.querySelector('#tutYes').addEventListener('click', function () {
-        Sound.click(); ov.remove(); Tutorial.start();
+        Sound.click();
+        document.body.classList.remove('tut-launch-on');
+        ov.remove();
+        Tutorial.start();
       });
       ov.querySelector('#tutNo').addEventListener('click', function () {
         Sound.click();
-        if (!opts.fromInstall) Tutorial.stored('skip');
+        document.body.classList.remove('tut-launch-on');
         ov.remove();
+        if (!opts.fromInstall) {
+          Tutorial.stored('skip');
+          setTimeout(function () {
+            if (GOO.openWalletCard) GOO.openWalletCard({ first: true });
+          }, 240);
+        }
         if (GOO.News && GOO.News.schedulePrompt) GOO.News.schedulePrompt(55 * 1000);
       });
     },
     replay: function () {
       var ask = document.querySelector('.tut-ask');
       if (ask) ask.remove();
+      document.body.classList.remove('tut-launch-on');
       if (this.card || this.veil) this.end(true);
       this.start();
     },
@@ -745,6 +757,7 @@
       this.clearTimers();
       this.stored('done');
       document.body.classList.remove('tut-on');
+      document.body.classList.remove('tut-launch-on');
       if (Notify.closeCrew) Notify.closeCrew();
       if (Notify.panel) Notify.panel.classList.remove('open');
       if (Compass && Compass.hide) Compass.hide();
@@ -757,7 +770,10 @@
       this.veil = this.card = this.pointer = this.progress = null;
       if (!silent) {
         Notify.toast({ tone: 'green', title: 'You are ready', sub: 'Earth, maps, crew and the ledger are live.', n: '🌊' });
-        if (GOO.News && GOO.News.schedulePrompt) GOO.News.schedulePrompt(1800);
+        setTimeout(function () {
+          if (GOO.openWalletCard) GOO.openWalletCard({ first: true });
+        }, 280);
+        if (GOO.News && GOO.News.schedulePrompt) GOO.News.schedulePrompt(8 * 1000);
       }
     }
   };
