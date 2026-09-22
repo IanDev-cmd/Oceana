@@ -15,15 +15,58 @@
   var ICON_APPLE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.3c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.2-2.8.9-3.5.9s-1.8-.8-3-.8c-1.5 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.3 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7 2-.1 2.9-2.2c1.1-1.2 1.5-2.4 1.5-2.5-.1 0-2.8-1.1-2.8-4z"/><path d="M14.8 6.7c.6-.8 1.1-1.8.9-2.9-1 .1-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.8 1.1.1 2.2-.6 2.9-1.4z"/></svg>';
   var ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.5 2.8v18.4c0 .5.5.8 1 .6l10.2-9.2L4.5 2.2c-.5-.2-1 .1-1 .6zm12.3 7.3 2.2-2-8.3-4.8 6.1 6.8zm2.2 5.8-2.2-2-6.1 6.8 8.3-4.8zM8.4 12 4.8 15.6V8.4L8.4 12z"/></svg>';
 
+  function pwaOrigin() {
+    return (location.origin && location.origin !== 'null')
+      ? location.origin.replace(/\/$/, '')
+      : PWA_LIVE.replace(/\/$/, '');
+  }
+
+  function shortInstallPath() {
+    return '/i';
+  }
+
   function pwaInstallUrl() {
-    var origin = (location.origin && location.origin !== 'null')
-      ? location.origin
-      : PWA_LIVE;
-    return origin.replace(/\/$/, '') + '/install.html';
+    return pwaOrigin() + shortInstallPath();
+  }
+
+  function shortInstallLabel() {
+    return pwaOrigin().replace(/^https?:\/\//, '') + shortInstallPath();
   }
 
   function qrSrc(url) {
     return 'https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=6&color=0d0f0c&bgcolor=ffffff&data=' + encodeURIComponent(url);
+  }
+
+  function paintInstallQr(host, url) {
+    if (!host) return;
+    var tries = 0;
+    function drawLocal() {
+      try {
+        var svg = GOO.qrSvg && GOO.qrSvg(url, 196);
+        if (svg) {
+          host.innerHTML = svg;
+          if (host.querySelector('svg')) return true;
+        }
+      } catch (e) {}
+      return false;
+    }
+    function drawRemote() {
+      host.innerHTML = '<img alt="Scan to install" width="196" height="196" src="' + qrSrc(url) + '">';
+      var img = host.querySelector('img');
+      if (!img) return;
+      img.addEventListener('error', function () {
+        img.src = 'https://quickchart.io/qr?size=196&margin=2&text=' + encodeURIComponent(url);
+      });
+    }
+    function tick() {
+      if (drawLocal()) return;
+      if (++tries < 12) {
+        setTimeout(tick, 50);
+        return;
+      }
+      drawRemote();
+    }
+    tick();
   }
 
   function wantAutoInstall() {
@@ -138,6 +181,7 @@
         existing.classList.add('show');
         var nowBtn = existing.querySelector('#tutInstallNow');
         if (nowBtn && deferredPrompt) nowBtn.classList.add('ready');
+        paintInstallQr(existing.querySelector('#tutQr'), pwaInstallUrl());
         return;
       }
       var ov = document.createElement('div');
@@ -153,12 +197,13 @@
           '</div>' +
           '<div class="tut-launch-body">' +
             '<div class="tut-qr">' +
-              '<img id="tutQr" alt="QR code to install the PWA" width="220" height="220" src="' + qrSrc(url) + '">' +
+              '<div id="tutQr" class="tut-qr-code" role="img" aria-label="QR code to install the PWA"></div>' +
               '<b>SCAN ME</b>' +
               '<i>Install as an app — not the browser</i>' +
+              '<a class="tut-tiny" id="tutTiny" href="' + url + '"><span>Type on any phone</span>' + shortInstallLabel() + '</a>' +
             '</div>' +
             '<div class="tut-launch-copy">' +
-              '<p>Scan the QR from another phone, or install on this device as an app — not the browser tab.</p>' +
+              '<p>Scan the QR, or type the short link on any phone or browser — it opens the same install page.</p>' +
               '<div class="tpop-kpis">' +
                 '<div class="tpop-kpi"><b>PWA</b><i>PHONE</i></div>' +
                 '<div class="tpop-kpi"><b>3D / 2D</b><i>MAPS</i></div>' +
@@ -186,6 +231,7 @@
         '</article>';
       document.body.appendChild(ov);
       if (GOO.News && GOO.News.hidePrompt) GOO.News.hidePrompt();
+      paintInstallQr(ov.querySelector('#tutQr'), url);
       requestAnimationFrame(function () { ov.classList.add('show'); });
       function bindStore(id) {
         var btn = ov.querySelector('#' + id);

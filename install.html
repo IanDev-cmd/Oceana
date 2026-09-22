@@ -4,18 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1210">
+<meta name="application-name" content="Guardians">
+<meta name="apple-mobile-web-app-title" content="Guardians">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), gyroscope=(), accelerometer=(), magnetometer=(), usb=(), midi=(), display-capture=(), payment=()">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'">
 <title>Install Guardians of the Ocean</title>
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="pwa/island-weather-pwa/icons/icon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="pwa/island-weather-pwa/icons/icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+<link rel="apple-touch-icon" sizes="192x192" href="pwa/island-weather-pwa/icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="pwa/island-weather-pwa/icons/icon-512.png">
 <style>
   :root{ --ink:#0d0f0c; --muted:#6b7268; --ok:#16a34a; }
   *{ box-sizing:border-box; }
-  html,body{ margin:0; min-height:100%; font-family:'Space Grotesk',sans-serif; }
+  html,body{ margin:0; min-height:100%; font-family:system-ui,-apple-system,'Segoe UI',sans-serif; }
   body{
     min-height:100dvh;
     display:flex; align-items:center; justify-content:center;
@@ -37,28 +45,28 @@
   .rank{
     width:32px; height:32px; border-radius:8px; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
-    background:var(--ink); color:#fff; font:600 12px/1 'JetBrains Mono',monospace;
+    background:var(--ink); color:#fff; font:600 12px/1 ui-monospace,'Cascadia Mono','Segoe UI Mono',monospace;
   }
   .h b{ display:block; font-size:15px; letter-spacing:.04em; }
-  .h i{ display:block; font:600 9px/1.3 'JetBrains Mono',monospace; color:var(--muted); font-style:normal; margin-top:2px; }
+  .h i{ display:block; font:600 9px/1.3 ui-monospace,monospace; color:var(--muted); font-style:normal; margin-top:2px; }
   .ph{
-    margin-left:auto; font:600 10px/1 'JetBrains Mono',monospace;
+    margin-left:auto; font:600 10px/1 ui-monospace,monospace;
     color:#166534; background:rgba(22,163,74,.16); padding:5px 8px; border-radius:8px;
   }
   .icon{
     width:88px; height:88px; margin:8px auto 14px; display:block;
     border-radius:20px; box-shadow:0 10px 24px rgba(0,16,40,.2);
   }
-  p{ margin:0 0 14px; font:500 15px/1.45 'Space Grotesk',sans-serif; color:#3b4653; text-align:center; }
+  p{ margin:0 0 14px; font:500 15px/1.45 system-ui,-apple-system,'Segoe UI',sans-serif; color:#3b4653; text-align:center; }
   .status{
-    text-align:center; font:600 11px/1.4 'JetBrains Mono',monospace;
+    text-align:center; font:600 11px/1.4 ui-monospace,monospace;
     color:#166534; margin-bottom:14px; letter-spacing:.02em; min-height:1.4em;
   }
   .status.warn{ color:#c07a12; }
   .install, .go, .web{
     display:flex; align-items:center; justify-content:center; gap:10px;
     width:100%; min-height:52px; border:none; border-radius:12px; cursor:pointer;
-    font:700 15px/1 'Space Grotesk',sans-serif; letter-spacing:.06em;
+    font:700 15px/1 system-ui,-apple-system,'Segoe UI',sans-serif; letter-spacing:.06em;
   }
   .install, .go{ background:var(--ok); color:#fff; }
   .web{ background:#efefed; color:var(--ink); margin-top:8px; }
@@ -66,12 +74,12 @@
   .install svg, .go svg{ width:18px; height:18px; }
   .ios{
     display:none; margin-top:14px; background:#f4f5f1; border-radius:12px; padding:12px 14px;
-    font:500 13px/1.5 'Space Grotesk',sans-serif; color:#3b4653;
+    font:500 13px/1.5 system-ui,sans-serif; color:#3b4653;
   }
   .ios.on{ display:block; }
   .ios b{ display:block; margin-bottom:6px; color:var(--ink); }
   .ios ol{ margin:0; padding-left:18px; }
-  .note{ margin-top:12px; font:600 10px/1.4 'JetBrains Mono',monospace; color:var(--muted); text-align:center; }
+  .note{ margin-top:12px; font:600 10px/1.4 ui-monospace,monospace; color:var(--muted); text-align:center; }
 
   .fill-wrap{ display:flex; flex-direction:column; align-items:center; padding:12px 0 8px; }
   .bowl{
@@ -83,6 +91,7 @@
     position:absolute; left:-18%; width:136%; bottom:0; height:0%;
     background:linear-gradient(180deg, #86efac 0%, #22c55e 38%, #16a34a 72%, #15803d 100%);
     border-radius:45% 45% 0 0 / 28% 28% 0 0;
+    transition: height .12s linear;
   }
   .water::before, .water::after{
     content:""; position:absolute; top:-18px; height:36px; width:70%;
@@ -97,12 +106,13 @@
   }
   .pct{
     position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    font:700 32px/1 'JetBrains Mono',monospace; color:var(--ink); z-index:2;
+    font:700 32px/1 ui-monospace,monospace; color:var(--ink); z-index:2;
     text-shadow:0 1px 0 rgba(255,255,255,.55);
   }
   .pct.light{ color:#fff; text-shadow:0 1px 8px rgba(0,40,16,.35); }
   @media (prefers-reduced-motion: reduce){
     .water::before, .water::after{ animation:none; }
+    .water{ transition:none; }
   }
 </style>
 </head>
@@ -115,7 +125,7 @@
         <span class="ph">PWA</span>
       </div>
       <img class="icon" src="pwa/island-weather-pwa/icons/icon-192.png" width="192" height="192" alt="Guardians of the Ocean">
-      <p>Add Guardians of the Ocean to your phone as an app. This page installs it — it does not open the browser version.</p>
+      <p>Add Guardians of the Ocean to this phone or laptop as an app. Nothing extra is requested during install.</p>
       <div class="status" id="status">Preparing install…</div>
       <button type="button" class="install" id="installBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 21h16"/></svg>
@@ -129,22 +139,22 @@
           <li>Tap <b>Add</b> — then open the app icon, not Safari.</li>
         </ol>
       </div>
-      <div class="note" id="note">Chrome or Edge on Android can install in one tap. Safari needs Add to Home Screen.</div>
+      <div class="note" id="note">Chrome, Edge, and Samsung Internet install in one tap. Safari uses Add to Home Screen. No notifications or location are asked until you use those features later.</div>
     </div>
 
     <div class="stage" id="stageFill">
       <div class="h">
         <span class="rank">02</span>
-        <div><b>INSTALLING</b><i>Adding the app to this device</i></div>
+        <div><b>INSTALLING</b><i>Saving the app on this device</i></div>
         <span class="ph">PWA</span>
       </div>
       <div class="fill-wrap">
         <div class="bowl" aria-hidden="true">
           <div class="water" id="water"></div>
-          <span class="pct" id="fillPct">0%</span>
+          <span class="pct" id="fillPct" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">0%</span>
         </div>
       </div>
-      <p id="fillCopy">Filling the app onto your home screen…</p>
+      <p id="fillCopy">Downloading app files…</p>
     </div>
 
     <div class="stage" id="stageGo">
@@ -167,15 +177,21 @@
 (function () {
   var APP = 'pwa/island-weather-pwa/index.html';
   var WEB_KEY = 'goo-web-ok';
-  var PROTO = 'web+goo://open';
   var statusEl = document.getElementById('status');
   var btn = document.getElementById('installBtn');
   var iosHelp = document.getElementById('iosHelp');
   var water = document.getElementById('water');
   var fillPct = document.getElementById('fillPct');
+  var fillCopy = document.getElementById('fillCopy');
   var deferred = null;
   var filling = false;
-  var ios = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  var finished = false;
+  var cacheDone = false;
+  var nativeDone = false;
+  var shown = 0;
+  var downloadPct = 0;
+  var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var samsung = /SamsungBrowser/i.test(navigator.userAgent);
   var standalone = matchMedia('(display-mode: standalone)').matches || !!navigator.standalone;
 
   function setStatus(text, warn) {
@@ -199,6 +215,60 @@
     return url.href;
   }
 
+  function setFill(pct, label) {
+    shown = Math.max(shown, Math.min(100, Math.round(pct)));
+    fillPct.textContent = shown + '%';
+    fillPct.setAttribute('aria-valuenow', String(shown));
+    fillPct.classList.toggle('light', shown >= 52);
+    water.style.height = shown + '%';
+    if (label) fillCopy.textContent = label;
+  }
+
+  function mappedPct() {
+    var d = Math.max(0, Math.min(100, downloadPct));
+    if (cacheDone && nativeDone) return 100;
+    if (!nativeDone) return Math.min(90, d * 0.9);
+    return Math.min(99, 90 + d * 0.1);
+  }
+
+  function maybeFinish() {
+    if (finished) return;
+    if (!(cacheDone && nativeDone)) return;
+    finished = true;
+    setFill(100, 'App installed');
+    setTimeout(function () { show('stageGo'); }, 180);
+  }
+
+  function onProgress(d) {
+    if (!d || d.type !== 'goo-install-progress') return;
+    if (d.error && !cacheDone) {
+      setStatus(d.error, true);
+      if (filling) {
+        filling = false;
+        show('stageInstall');
+        btn.disabled = false;
+      }
+      return;
+    }
+    if (typeof d.downloadPct === 'number') downloadPct = d.downloadPct;
+    if (d.complete || d.phase === 'done' || d.downloadPct >= 100) cacheDone = true;
+    if (filling) {
+      setFill(mappedPct(), d.label || fillCopy.textContent);
+      maybeFinish();
+    } else if (!standalone) {
+      if (cacheDone) setStatus('App files ready — tap Install App.');
+      else setStatus('Downloading app files… ' + Math.round(downloadPct) + '%');
+    }
+  }
+
+  function beginFill() {
+    if (filling || finished) return;
+    filling = true;
+    show('stageFill');
+    setFill(mappedPct(), cacheDone ? 'Saving the app on this device…' : 'Downloading app files…');
+    maybeFinish();
+  }
+
   if (standalone) {
     location.replace(APP);
     return;
@@ -208,85 +278,91 @@
     iosHelp.classList.add('on');
     btn.textContent = 'SHOW IPHONE STEPS';
     setStatus('Safari cannot auto-install. Add it to your Home Screen.', true);
+    nativeDone = true;
   }
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(function () {});
-  }
-
-  function runFill(done) {
-    if (filling) return;
-    filling = true;
-    show('stageFill');
-    var t0 = performance.now();
-    var dur = 2400;
-    function tick(now) {
-      var p = Math.min(1, (now - t0) / dur);
-      var eased = 1 - Math.pow(1 - p, 3);
-      var pct = Math.round(eased * 100);
-      fillPct.textContent = pct + '%';
-      fillPct.classList.toggle('light', pct >= 52);
-      water.style.height = (eased * 100) + '%';
-      if (p < 1) requestAnimationFrame(tick);
-      else done();
-    }
-    requestAnimationFrame(tick);
-  }
-
-  function afterInstalled() {
-    runFill(function () { show('stageGo'); });
+    navigator.serviceWorker.addEventListener('message', function (e) { onProgress(e.data); });
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none', scope: './' }).then(function (reg) {
+      if (reg.waiting) {
+        try { reg.waiting.postMessage({ type: 'goo-skip-wait' }); } catch (e) {}
+      }
+      function ping(worker) {
+        if (!worker) return;
+        try { worker.postMessage({ type: 'goo-install-status' }); } catch (e) {}
+      }
+      ping(reg.installing || reg.waiting || reg.active);
+      if (reg.installing) {
+        reg.installing.addEventListener('statechange', function () {
+          ping(reg.installing || reg.waiting || reg.active);
+        });
+      }
+      navigator.serviceWorker.ready.then(function (ready) {
+        ping(ready.active);
+      }).catch(function () {});
+    }).catch(function () {
+      setStatus('This browser blocked the app worker. Use Chrome, Edge, or Samsung Internet.', true);
+    });
   }
 
   window.addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault();
     deferred = e;
-    setStatus('Ready — tap Install App to add it to your home screen.');
+    if (!filling) setStatus('Ready — tap Install App to add it to your home screen.');
     btn.disabled = false;
   });
 
   window.addEventListener('appinstalled', function () {
-    afterInstalled();
+    nativeDone = true;
+    beginFill();
+    maybeFinish();
   });
-
-  if (navigator.getInstalledRelatedApps) {
-    navigator.getInstalledRelatedApps().then(function (apps) {
-      if (!apps || !apps.length || filling) return;
-      if (!document.getElementById('stageInstall').classList.contains('on')) return;
-      show('stageGo');
-    }).catch(function () {});
-  }
 
   btn.addEventListener('click', function () {
     if (ios) {
       iosHelp.classList.add('on');
+      beginFill();
       setStatus('Use Share → Add to Home Screen, then open the icon.', true);
       return;
     }
+    beginFill();
     if (!deferred) {
-      setStatus('Install is not available in this browser yet. Use Chrome or Edge.', true);
+      if (samsung || /Chrome|Edg|Chromium|OPR|Opera/i.test(navigator.userAgent)) {
+        setStatus('If the system install sheet did not open, use the browser menu → Install app / Add to Home screen.', true);
+      } else {
+        setStatus('Use the browser menu → Add to Home screen, then open the Guardians icon.', true);
+      }
       return;
     }
     btn.disabled = true;
     deferred.prompt();
     deferred.userChoice.then(function (choice) {
       if (choice.outcome === 'accepted') {
-        afterInstalled();
+        nativeDone = true;
+        maybeFinish();
       } else {
+        filling = false;
+        shown = Math.min(shown, 90);
+        show('stageInstall');
         setStatus('Install cancelled. Tap Install App again to add it as an app.', true);
         btn.disabled = false;
       }
       deferred = null;
+    }).catch(function () {
+      filling = false;
+      show('stageInstall');
+      btn.disabled = false;
     });
   });
 
   document.getElementById('goApp').addEventListener('click', function () {
+    var url = appUrl(false);
     var hidden = false;
     function left() { hidden = document.hidden; }
     document.addEventListener('visibilitychange', left);
-    try { location.href = PROTO; } catch (e) {}
+    var w = window.open(url, '_blank', 'noopener,noreferrer');
     setTimeout(function () {
       if (document.hidden || hidden) return;
-      var w = window.open(appUrl(false), '_blank', 'noopener');
       if (!w) {
         document.querySelector('#stageGo p').textContent =
           'Tap the Guardians icon on your home screen to open the real app.';
@@ -300,8 +376,8 @@
   });
 
   setTimeout(function () {
-    if (standalone || deferred || ios || filling) return;
-    setStatus('Waiting for the browser install prompt… tap Install App when it lights up.', true);
+    if (standalone || deferred || ios || filling || cacheDone) return;
+    setStatus('Preparing the app files… tap Install App when it lights up.', true);
   }, 2500);
 })();
 </script>

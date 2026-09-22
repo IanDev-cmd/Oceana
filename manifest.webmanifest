@@ -1,39 +1,59 @@
 {
+  "id": "/pwa/island-weather-pwa/index.html",
   "name": "Guardians of the Ocean",
   "short_name": "Guardians",
-  "description": "Global Impact Ledger PWA with live 3D globe, 2D coastal maps and GPS compass.",
+  "description": "Coastal restoration ledger with a 3D globe, 2D maps, and a home-screen app. No extra install permissions.",
+  "lang": "en",
+  "dir": "ltr",
   "start_url": "./pwa/island-weather-pwa/index.html",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
-  "launch_handler": { "client_mode": "focus-existing" },
-  "protocol_handlers": [
-    {
-      "protocol": "web+goo",
-      "url": "./pwa/island-weather-pwa/index.html?launch=%s"
-    }
-  ],
-  "related_applications": [
-    {
-      "platform": "webapp",
-      "url": "./manifest.webmanifest"
-    }
-  ],
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "orientation": "any",
   "background_color": "#0b1210",
   "theme_color": "#0b1210",
+  "categories": ["education", "utilities", "navigation", "news"],
+  "prefer_related_applications": false,
+  "handle_links": "preferred",
+  "launch_handler": { "client_mode": ["focus-existing", "navigate-existing"] },
   "icons": [
     {
       "src": "./pwa/island-weather-pwa/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "./pwa/island-weather-pwa/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "./pwa/island-weather-pwa/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "./pwa/island-weather-pwa/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./pwa/island-weather-pwa/background.jpg",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Guardians home screen"
+    },
+    {
+      "src": "./assets/3d/earth-preview.webp",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "3D Earth desk"
     }
   ]
 }

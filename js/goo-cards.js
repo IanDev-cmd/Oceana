@@ -432,7 +432,7 @@ document.addEventListener('pointerover', function(e){
 
   function paintAside(d){
     var wallet = current === 'wallet';
-    if (balanceDock) balanceDock.hidden = !wallet;
+    if (balanceDock) balanceDock.hidden = true;
     if (!asidePreview) return;
     asidePreview.hidden = wallet;
     if (wallet || !d) return;

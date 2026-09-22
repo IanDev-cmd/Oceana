@@ -4,9 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#0b1210" />
+<meta name="application-name" content="Guardians" />
+<meta name="apple-mobile-web-app-title" content="Guardians" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
 <title>Save the Ocean</title>
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="pwa/island-weather-pwa/icons/icon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="pwa/island-weather-pwa/icons/icon-192.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,9 +24,9 @@
 <link rel="preload" href="assets/3d/earth-atmos.jpg" as="image">
 <link rel="preload" href="assets/images/cards/thirsty.webp" as="image" type="image/webp">
 <link rel="preload" href="assets/images/cities/jakarta.webp" as="image" type="image/webp">
-<link rel="stylesheet" href="css/goo.css?v=37" />
-<script src="js/goo-core.js?v=37"></script>
-<script src="js/goo-news.js?v=37"></script>
+<link rel="stylesheet" href="css/goo.css?v=40" />
+<script src="js/goo-core.js?v=40"></script>
+<script src="js/goo-news.js?v=39"></script>
 
 <style>
 /* =====================================================================
@@ -385,7 +390,7 @@ button.uxrow{
 }
 .uxclose svg{ width:16px; height:16px; stroke:#fff; stroke-width:2; fill:none; stroke-linecap:round; }
 
-.ux-balance-dock{ display:flex; flex-direction:column; gap:10px; }
+.ux-balance-dock{ display:none !important; }
 .ux-balance-dock[hidden], .ux-bal-card[hidden]{ display:none !important; }
 .ux-bal-card{
   background:#fff; color:#0d0f0c; text-align:left;
@@ -1956,9 +1961,10 @@ html.embed .uxclose-pwa{ display:flex !important; }
 <script src="js/api/client.js" defer></script>
 <script src="js/api/wallet-ui.js" defer></script>
 <script src="js/boot.js" defer></script>
-<script src="js/goo-cards.js?v=37" defer></script>
-<script src="js/goo-map.js?v=37" defer></script>
+<script src="js/goo-cards.js?v=40" defer></script>
+<script src="js/goo-map.js?v=39" defer></script>
 <script src="js/goo-compass.js" defer></script>
-<script src="js/goo-shell.js?v=37" defer></script>
+<script src="js/qr.js?v=39" defer></script>
+<script src="js/goo-shell.js?v=39" defer></script>
 </body>
 </html>

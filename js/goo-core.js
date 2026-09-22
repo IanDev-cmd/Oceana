@@ -295,6 +295,10 @@
     card.style.setProperty('--wc-s', String(s));
   }
 
+  function setWalletGeo(on) {
+    document.documentElement.classList.toggle('goo-wallet-geo', !!on);
+  }
+
   function openWalletCard(opts) {
     opts = opts || {};
     var first = !!opts.first;
@@ -335,6 +339,7 @@
         '</div>' +
       '</article>';
     document.body.appendChild(wrap);
+    setWalletGeo(true);
     var card = wrap.querySelector('.welcome-card');
     var track = wrap.querySelector('#welcomeTrack');
     var statusEl = wrap.querySelector('#welcomeStatus');
@@ -378,6 +383,7 @@
       if (!card || !target || reduce) {
         wrap.remove();
         clearWalletTimers();
+        setWalletGeo(false);
         return;
       }
       var cr = card.getBoundingClientRect();
@@ -394,6 +400,7 @@
       setTimeout(function () {
         wrap.remove();
         clearWalletTimers();
+        setWalletGeo(false);
       }, 980);
     }
     function dismissNow(fromPop) {
@@ -402,6 +409,7 @@
       persistFirst();
       wrap.remove();
       clearWalletTimers();
+      setWalletGeo(false);
       if (!fromPop) dropHist();
     }
     if (first) walletTimers.push(setTimeout(flyAway, 5000));

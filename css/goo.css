@@ -485,12 +485,26 @@ body[data-shell="pwa"] .tut-replay{
   flex:0 0 220px; text-align:center;
   background:#f4f5f1; padding:12px 12px 10px; border-radius:14px;
 }
-.tut-qr img{
+.tut-qr img,
+.tut-qr svg,
+.tut-qr-code{
   width:196px; height:196px; display:block; margin:0 auto 8px;
   background:#fff; border-radius:8px;
 }
+.tut-qr-code svg{ width:196px; height:196px; margin:0; }
 .tut-qr b{ display:block; font:700 13px/1 'Space Grotesk',sans-serif; letter-spacing:.12em; }
 .tut-qr i{ display:block; font:600 9px/1.4 'JetBrains Mono',monospace; color:#166534; margin-top:4px; font-style:normal; letter-spacing:.04em; }
+.tut-tiny{
+  display:block; margin-top:8px; word-break:break-all;
+  font:700 10px/1.35 'JetBrains Mono',monospace; color:#0d0f0c;
+  text-decoration:none; letter-spacing:0;
+  background:#fff; border-radius:8px; padding:7px 8px;
+}
+.tut-tiny span{
+  display:block; font:700 8px/1 'Space Grotesk',sans-serif;
+  letter-spacing:.14em; text-transform:uppercase; color:#166534;
+  margin-bottom:4px;
+}
 .tut-launch-copy{ flex:1; min-width:0; display:flex; flex-direction:column; }
 .tut-launch-copy > p{
   margin:0 0 12px; font:500 15px/1.45 'Space Grotesk',sans-serif; color:#3b4653;
@@ -842,6 +856,7 @@ html.mobile .gsearch{ width:min(440px, 72vw); }
 .ux-ledger-card li i{ font-style:normal; color:#6b7268; font-size:11px; font-weight:500; }
 .ux-ledger-card li b{ font:700 13px/1 'Space Grotesk',sans-serif; white-space:nowrap; }
 
+html.goo-wallet-geo .pay-stack{ visibility:hidden; pointer-events:none; }
 .welcome-ask{
   position:fixed; inset:0; z-index:360;
   display:flex; align-items:center; justify-content:center;

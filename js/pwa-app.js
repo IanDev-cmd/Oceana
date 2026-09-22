@@ -29,8 +29,7 @@
       card:{ rank:'00', title:'3D EARTH', sub:'Immersive globe desk', badge:'LIVE', kpis:[{n:'3D',l:'GLOBE'},{n:'10',l:'CITIES'},{n:'LIVE',l:'SPIN'}], fund:'Step into the full Earth desk — spin the planet, search coasts, and walk every node.', ctas:[{id:'immerse', label:'IMMERSE', view:'globe'},{id:'hash', label:'2D MAPS', cls:'hash', view:'world'}] } },
     { id:'audit', hue:'#2563eb', label:'Verified Audit Trail', svg:'<path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3Z" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
       card:{ rank:'01', title:'VERIFIED AUDIT', sub:'Hedera consensus', badge:'LIVE', kpis:[{n:'100%',l:'IMMUTABLE'},{n:'48.2k',l:'CHECKS'},{n:'3.2s',l:'FINALITY'}], fund:'On-chain state proofs across 8 countries', ctas:[{id:'openMap', label:'OPEN MAP', view:'map'},{id:'hash', label:'HASHSCAN', cls:'hash', view:'map'}] } },
-    { id:'wallet', hue:'#16a34a', label:'Wallet', svg:'<path d="M12 3v18" stroke-width="1.8" stroke-linecap="round"/><path d="M16.3 7.2c0-2-1.9-3.4-4.3-3.4S7.7 5.2 7.7 7.4c0 4.2 8.6 2.6 8.6 7 0 2.1-1.9 3.4-4.3 3.4s-4.3-1.3-4.3-3.3" stroke-width="1.8" stroke-linecap="round"/>',
-      card:{ rank:'02', title:'WALLET', sub:'Ocean cleaning fund', badge:'$', kpis:[{n:'10.0',l:'TOKEN'},{n:'85/15',l:'SPLIT'},{n:'LIVE',l:'LEDGER'}], fund:'Welcome token and Stripe payouts for ocean cleaning activities.', ctas:[{id:'openWallet', label:'OPEN WALLET', view:'wallet'},{id:'hash', label:'LEDGER', cls:'hash', view:'wallet'}] } },
+    { id:'wallet', hue:'#16a34a', label:'Wallet', svg:'<path d="M12 3v18" stroke-width="1.8" stroke-linecap="round"/><path d="M16.3 7.2c0-2-1.9-3.4-4.3-3.4S7.7 5.2 7.7 7.4c0 4.2 8.6 2.6 8.6 7 0 2.1-1.9 3.4-4.3 3.4s-4.3-1.3-4.3-3.3" stroke-width="1.8" stroke-linecap="round"/>' },
     { id:'roadmap', hue:'#0ea5e9', label:'2D Coastal Maps', svg:'<path d="M4 18c3-6 6-2 9-8 2-4 4-4 7-4" stroke-width="1.6" stroke-linecap="round"/><circle cx="4" cy="18" r="1.3" stroke-width="1.6"/><circle cx="20" cy="6" r="1.3" stroke-width="1.6"/>', open:'map' },
     { id:'proof', hue:'#a855f7', label:'Proof of Execution', svg:'<path d="M6 3h12v17l-2-1.3-2 1.3-2-1.3-2 1.3-2-1.3-2 1.3V3Z" stroke-width="1.5" stroke-linejoin="round"/><path d="M8.5 8h7M8.5 11.5h7M8.5 15h4" stroke-width="1.5" stroke-linecap="round"/>',
       card:{ rank:'04', title:'PROOF OF EXECUTION', sub:'Downloadable records', badge:'PDF', kpis:[{n:'12.4k',l:'RECORDS'},{n:'HCS',l:'HASHED'},{n:'100%',l:'LINKED'}], fund:'Each PDF carries a live Hedera transaction hash', ctas:[{id:'openMap', label:'OPEN MAP', view:'map'},{id:'hash', label:'RECEIPTS', cls:'hash', view:'map'}] } },
@@ -71,8 +70,9 @@
     }
   }
 
+  var VIEWS = { globe: 1, map: 1, world: 1, wallet: 1, milestone: 1, roadmap: 1 };
   function openWebView(view, fromPop) {
-    view = view || 'globe';
+    view = VIEWS[view] ? view : 'globe';
     pendingView = view;
     loadEl.classList.add('show');
     if (Sound) Sound.click();
@@ -83,6 +83,8 @@
     iframe = document.createElement('iframe');
     iframe.id = 'pwaIframe';
     iframe.title = 'Guardians maps';
+    iframe.setAttribute('allow', 'geolocation; accelerometer; gyroscope; magnetometer');
+    iframe.referrerPolicy = 'same-origin';
     iframe.addEventListener('load', function () {
       if (!frameEl.classList.contains('show')) return;
       try {
@@ -234,7 +236,6 @@
       btn.classList.add('active');
       if (item.id === 'globe') btn.classList.add('glow');
       if (item.id === 'wallet') {
-        showCard(item);
         if (window.GOO && GOO.openWalletCard) GOO.openWalletCard();
         if (Sound) Sound.click();
         return;

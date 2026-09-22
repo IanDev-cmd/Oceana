@@ -227,34 +227,18 @@
   function showNative(items, seen) {
     var fresh = items.filter(function (it) { return seen.indexOf(it.id) < 0; }).slice(0, MAX_PUSH);
     if (!fresh.length) return Promise.resolve(0);
+    if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return Promise.resolve(0);
     var badge = iconBase() + 'pwa/island-weather-pwa/icons/icon-192.png';
-    function viaReg(reg) {
-      return Promise.all(fresh.map(function (it) {
-        return reg.showNotification(it.title, {
-          body: it.source + ' · ' + labelOf(it.cat),
+    fresh.forEach(function (it) {
+      try {
+        new Notification(String(it.title || 'Coastal news').slice(0, 120), {
+          body: String((it.source || '') + ' · ' + labelOf(it.cat)).slice(0, 180),
           icon: it.icon || badge,
-          badge: badge,
-          tag: 'goo-news-' + it.id.slice(-40),
-          data: { url: it.url },
-          timestamp: it.at || Date.now(),
-          vibrate: [120, 80, 120],
-          renotify: true
+          tag: 'goo-news-' + String(it.id || '').slice(-40)
         });
-      })).then(function () { return fresh.length; });
-    }
-    if (typeof navigator !== 'undefined' && navigator.serviceWorker) {
-      return navigator.serviceWorker.ready.then(viaReg).catch(function () {
-        if (Notification.permission !== 'granted') return 0;
-        fresh.forEach(function (it) {
-          try { new Notification(it.title, { body: it.source + ' · ' + labelOf(it.cat), icon: it.icon || badge }); } catch (e) {}
-        });
-        return fresh.length;
-      });
-    }
-    if (typeof self !== 'undefined' && self.registration && self.registration.showNotification) {
-      return viaReg(self.registration);
-    }
-    return Promise.resolve(0);
+      } catch (e) {}
+    });
+    return Promise.resolve(fresh.length);
   }
 
   function apply(items, opts) {
@@ -323,11 +307,6 @@
         var tutSeen = false;
         try { tutSeen = !!localStorage.getItem('goo-tutorial-v3'); } catch (e) {}
         if (tutSeen) News.schedulePrompt(55 * 1000);
-        navigator.serviceWorker && navigator.serviceWorker.ready.then(function (reg) {
-          if (reg.periodicSync && reg.periodicSync.register) {
-            reg.periodicSync.register('goo-news', { minInterval: 60 * 60 * 1000 }).catch(function () {});
-          }
-        }).catch(function () {});
       }
     },
     prompt: function (opts) {

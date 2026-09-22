@@ -8,6 +8,19 @@ services:
     branch: main
     buildCommand: "true"
     staticPublishPath: .
+    routes:
+      - type: redirect
+        source: /i
+        destination: /install.html
+      - type: redirect
+        source: /i/
+        destination: /install.html
+      - type: redirect
+        source: /go
+        destination: /install.html
+      - type: redirect
+        source: /go/
+        destination: /install.html
     headers:
       - path: /sw.js
         name: Cache-Control
@@ -15,3 +28,18 @@ services:
       - path: /manifest.webmanifest
         name: Content-Type
         value: application/manifest+json
+      - path: /manifest.webmanifest
+        name: Cache-Control
+        value: no-cache
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+      - path: /*
+        name: Permissions-Policy
+        value: camera=(), microphone=(), usb=(), midi=(), display-capture=()
