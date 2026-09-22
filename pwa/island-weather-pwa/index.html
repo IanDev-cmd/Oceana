@@ -5,6 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1210">
 <title>Save the Ocean</title>
+<script>
+(function () {
+  var standalone = matchMedia('(display-mode: standalone)').matches || !!navigator.standalone;
+  var web = false;
+  try { web = sessionStorage.getItem('goo-web-ok') === '1'; } catch (e) {}
+  if (/(?:^|[?&])web=1(?:&|$)/.test(location.search)) {
+    try { sessionStorage.setItem('goo-web-ok', '1'); } catch (e) {}
+    web = true;
+  }
+  if (!standalone && !web) {
+    document.documentElement.classList.add('goo-block');
+    location.replace('../../install.html');
+  }
+})();
+</script>
+<style>html.goo-block,html.goo-block body{visibility:hidden!important}</style>
 <link rel="manifest" href="../../manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -208,10 +224,24 @@
   .tile.active svg *{
     stroke:#ffffff;
   }
+  .tile.glow{
+    animation:tileAttract 1.6s ease-in-out infinite;
+  }
+  @keyframes tileAttract{
+    0%,100%{
+      box-shadow:0 0 0 0 rgba(132,192,44,.55), 0 8px 18px rgba(0,0,0,.16);
+      transform:scale(1);
+    }
+    50%{
+      box-shadow:0 0 0 10px rgba(132,192,44,0), 0 12px 28px rgba(132,192,44,.42);
+      transform:scale(1.07);
+    }
+  }
   .tile svg *{
     stroke:var(--card-icon);
     transition:stroke .18s ease;
   }
+  .pay-card .tpop-cta button.pow{ background:#16a34a; }
 
   .pay-stack{
     width: var(--grid-w);
@@ -404,37 +434,19 @@
     <div class="pay-stack" id="pwaFeatureCard">
       <article class="pay-card">
         <div class="tpop-h">
-          <span class="tpop-rank">F</span>
-          <div><b>RESTORATION FUND</b><i>Stripe treasury · database</i></div>
-          <span class="tpop-ph" id="pwaPayLive">LIVE</span>
+          <span class="tpop-rank">00</span>
+          <div><b>3D EARTH</b><i>Immersive globe desk</i></div>
+          <span class="tpop-ph">LIVE</span>
         </div>
         <div class="tpop-kpis">
-          <div class="tpop-kpi"><b id="pwaBalOp">—</b><i>AVAILABLE</i></div>
-          <div class="tpop-kpi"><b id="pwaBalPaid">—</b><i>SETTLED</i></div>
-          <div class="tpop-kpi"><b id="pwaBalSplit">85/15</b><i>SPLIT</i></div>
+          <div class="tpop-kpi"><b>3D</b><i>GLOBE</i></div>
+          <div class="tpop-kpi"><b>10</b><i>CITIES</i></div>
+          <div class="tpop-kpi"><b>LIVE</b><i>SPIN</i></div>
         </div>
-        <div class="tpop-fund" id="pwaBalFund">Field ops 85% · treasury 15%</div>
-      </article>
-      <article class="pay-card">
-        <div class="tpop-h">
-          <span class="tpop-rank">P</span>
-          <div><b>PERSONAL PAYOUTS</b><i>Your Stripe orders</i></div>
-          <span class="tpop-ph" id="pwaPayStatus">EMAIL</span>
-        </div>
-        <div class="tpop-kpis">
-          <div class="tpop-kpi"><b id="pwaBalYou">—</b><i>PAID</i></div>
-          <div class="tpop-kpi"><b id="pwaBalPend">—</b><i>PENDING</i></div>
-          <div class="tpop-kpi"><b id="pwaBalOrders">0</b><i>ORDERS</i></div>
-        </div>
-        <div class="tpop-fund" id="pwaPayLine">Enter email to load your payouts</div>
-      </article>
-      <article class="pay-card">
-        <label class="pay-email">
-          <input id="pwaPayEmail" type="email" autocomplete="email" placeholder="you@example.com">
-        </label>
+        <div class="tpop-fund">Step into the full Earth desk — spin the planet, search coasts, and walk every node.</div>
         <div class="tpop-cta">
-          <button type="button" class="pow" id="pwaCheckout">CHECKOUT</button>
-          <button type="button" class="hash" id="pwaWalletView">WALLET</button>
+          <button type="button" class="pow" data-view="globe">IMMERSE</button>
+          <button type="button" class="hash" data-view="world">2D MAPS</button>
         </div>
       </article>
     </div>
@@ -478,6 +490,6 @@
 <script src="../../js/goo-news.js"></script>
 <script src="../../js/goo-compass.js"></script>
 <script src="../../js/goo-shell.js"></script>
-<script src="../../js/pwa-app.js"></script>
+<script src="../../js/pwa-app.js?v=34"></script>
 </body>
 </html>

@@ -702,6 +702,15 @@ html.embed .sat-peek{ display:none; }
   aspect-ratio:16/10;
 }
 .card .shot img{ width:100%; height:100%; object-fit:cover; display:block; }
+.card-x{
+  position:absolute; right:6px; top:6px; z-index:4;
+  width:22px; height:22px; border:none; border-radius:50%; padding:0;
+  background:rgba(13,15,12,.78); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; pointer-events:auto;
+}
+.card-x svg{ width:11px; height:11px; stroke:#fff; fill:none; stroke-width:2.2; stroke-linecap:round; }
+.card-x:hover{ background:#16a34a; }
 .card .cap{
   position:absolute; left:0; top:50%; transform:translateY(-50%);
   z-index:2; width:42%;
@@ -746,6 +755,10 @@ html.from-pwa .card{
   flex:0 0 auto;
   margin-bottom:0;
 }
+html.embed .card-x,
+html.from-pwa .card-x{
+  width:26px; height:26px; right:8px; top:8px;
+}
 html.embed .scrollbar,
 html.from-pwa .scrollbar{
   left:14%; right:14%; width:auto;
@@ -775,6 +788,18 @@ html.from-pwa .app.globe-focus .gctrl{
 }
 .back svg{ width:100%; height:100%; display:block; }
 .app.detail .back{ opacity:1; pointer-events:auto; }
+.app.detail .panel{ pointer-events:auto; }
+
+.photo-x{
+  position:absolute; right:12px; top:12px; z-index:9;
+  width:36px; height:36px; border:none; border-radius:50%; padding:0;
+  background:rgba(13,15,12,.82); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; pointer-events:auto;
+  box-shadow:0 6px 16px rgba(0,16,40,.28);
+}
+.photo-x svg{ width:16px; height:16px; stroke:#fff; fill:none; stroke-width:2; stroke-linecap:round; }
+.photo-x:hover{ background:#16a34a; }
 
 .detail h1{
   position:absolute; left:12.34%; top:6.2%; width:50%; margin:0; z-index:7;
@@ -1645,6 +1670,9 @@ html.embed .uxclose-pwa{ display:flex !important; }
     <h1 id="dTitle">Save the<br>Birds</h1>
     <span class="campaign" id="dCampaign">2018 Campaign</span>
     <div class="panel" id="panel">
+      <button type="button" class="photo-x" id="photoClose" aria-label="Close photo card">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
       <div class="copy" id="dCopy"></div>
       <div class="shot" id="dShot"><img id="dImg" alt=""></div>
     </div>
@@ -1918,7 +1946,7 @@ html.embed .uxclose-pwa{ display:flex !important; }
 <script src="js/api/client.js" defer></script>
 <script src="js/api/wallet-ui.js" defer></script>
 <script src="js/boot.js" defer></script>
-<script src="js/goo-cards.js" defer></script>
+<script src="js/goo-cards.js?v=34" defer></script>
 <script src="js/goo-map.js" defer></script>
 <script src="js/goo-compass.js" defer></script>
 <script src="js/goo-shell.js" defer></script>

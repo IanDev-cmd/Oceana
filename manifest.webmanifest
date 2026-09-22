@@ -5,6 +5,20 @@
   "start_url": "./pwa/island-weather-pwa/index.html",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "launch_handler": { "client_mode": "focus-existing" },
+  "protocol_handlers": [
+    {
+      "protocol": "web+goo",
+      "url": "./pwa/island-weather-pwa/index.html?launch=%s"
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "./manifest.webmanifest"
+    }
+  ],
   "orientation": "any",
   "background_color": "#0b1210",
   "theme_color": "#0b1210",

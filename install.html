@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="pwa/island-weather-pwa/icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root{ --ink:#0d0f0c; --muted:#6b7268; --ok:#16a34a; }
   *{ box-sizing:border-box; }
@@ -31,6 +31,8 @@
     padding:22px 20px 18px;
     box-shadow:0 18px 48px rgba(0,16,40,.32);
   }
+  .stage{ display:none; }
+  .stage.on{ display:block; }
   .h{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
   .rank{
     width:32px; height:32px; border-radius:8px; flex-shrink:0;
@@ -53,14 +55,15 @@
     color:#166534; margin-bottom:14px; letter-spacing:.02em; min-height:1.4em;
   }
   .status.warn{ color:#c07a12; }
-  .install{
+  .install, .go, .web{
     display:flex; align-items:center; justify-content:center; gap:10px;
     width:100%; min-height:52px; border:none; border-radius:12px; cursor:pointer;
-    background:var(--ok); color:#fff;
     font:700 15px/1 'Space Grotesk',sans-serif; letter-spacing:.06em;
   }
-  .install:disabled{ opacity:.7; cursor:wait; }
-  .install svg{ width:18px; height:18px; }
+  .install, .go{ background:var(--ok); color:#fff; }
+  .web{ background:#efefed; color:var(--ink); margin-top:8px; }
+  .install:disabled, .go:disabled{ opacity:.7; cursor:wait; }
+  .install svg, .go svg{ width:18px; height:18px; }
   .ios{
     display:none; margin-top:14px; background:#f4f5f1; border-radius:12px; padding:12px 14px;
     font:500 13px/1.5 'Space Grotesk',sans-serif; color:#3b4653;
@@ -69,39 +72,109 @@
   .ios b{ display:block; margin-bottom:6px; color:var(--ink); }
   .ios ol{ margin:0; padding-left:18px; }
   .note{ margin-top:12px; font:600 10px/1.4 'JetBrains Mono',monospace; color:var(--muted); text-align:center; }
+
+  .fill-wrap{ display:flex; flex-direction:column; align-items:center; padding:12px 0 8px; }
+  .bowl{
+    position:relative; width:156px; height:156px; border-radius:50%; overflow:hidden;
+    background:#e7f6ec;
+    box-shadow:0 0 0 3px #fff, 0 0 0 7px rgba(22,163,74,.35), 0 14px 32px rgba(0,16,40,.22);
+  }
+  .water{
+    position:absolute; left:-18%; width:136%; bottom:0; height:0%;
+    background:linear-gradient(180deg, #86efac 0%, #22c55e 38%, #16a34a 72%, #15803d 100%);
+    border-radius:45% 45% 0 0 / 28% 28% 0 0;
+  }
+  .water::before, .water::after{
+    content:""; position:absolute; top:-18px; height:36px; width:70%;
+    background:#4ade80; border-radius:50%; opacity:.85;
+    animation:swell 1.15s ease-in-out infinite;
+  }
+  .water::before{ left:-8%; }
+  .water::after{ right:-8%; animation-delay:-.55s; background:#86efac; opacity:.7; }
+  @keyframes swell{
+    0%,100%{ transform:translateY(0) scaleX(1); }
+    50%{ transform:translateY(7px) scaleX(1.08); }
+  }
+  .pct{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font:700 32px/1 'JetBrains Mono',monospace; color:var(--ink); z-index:2;
+    text-shadow:0 1px 0 rgba(255,255,255,.55);
+  }
+  .pct.light{ color:#fff; text-shadow:0 1px 8px rgba(0,40,16,.35); }
+  @media (prefers-reduced-motion: reduce){
+    .water::before, .water::after{ animation:none; }
+  }
 </style>
 </head>
 <body>
   <article class="card" role="dialog" aria-label="Install the app">
-    <div class="h">
-      <span class="rank">01</span>
-      <div><b>INSTALL THE APP</b><i>Home screen · not the browser</i></div>
-      <span class="ph">PWA</span>
+    <div class="stage on" id="stageInstall">
+      <div class="h">
+        <span class="rank">01</span>
+        <div><b>INSTALL THE APP</b><i>Home screen · not the browser</i></div>
+        <span class="ph">PWA</span>
+      </div>
+      <img class="icon" src="pwa/island-weather-pwa/icons/icon-192.png" width="192" height="192" alt="Guardians of the Ocean">
+      <p>Add Guardians of the Ocean to your phone as an app. This page installs it — it does not open the browser version.</p>
+      <div class="status" id="status">Preparing install…</div>
+      <button type="button" class="install" id="installBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 21h16"/></svg>
+        INSTALL APP
+      </button>
+      <div class="ios" id="iosHelp">
+        <b>iPhone / iPad</b>
+        <ol>
+          <li>Tap the <b>Share</b> button in Safari.</li>
+          <li>Choose <b>Add to Home Screen</b>.</li>
+          <li>Tap <b>Add</b> — then open the app icon, not Safari.</li>
+        </ol>
+      </div>
+      <div class="note" id="note">Chrome or Edge on Android can install in one tap. Safari needs Add to Home Screen.</div>
     </div>
-    <img class="icon" src="pwa/island-weather-pwa/icons/icon-192.png" width="192" height="192" alt="Guardians of the Ocean">
-    <p>Add Guardians of the Ocean to your phone as an app. This page installs it — it does not open the browser version.</p>
-    <div class="status" id="status">Preparing install…</div>
-    <button type="button" class="install" id="installBtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 21h16"/></svg>
-      INSTALL APP
-    </button>
-    <div class="ios" id="iosHelp">
-      <b>iPhone / iPad</b>
-      <ol>
-        <li>Tap the <b>Share</b> button in Safari.</li>
-        <li>Choose <b>Add to Home Screen</b>.</li>
-        <li>Tap <b>Add</b> — then open the app icon, not Safari.</li>
-      </ol>
+
+    <div class="stage" id="stageFill">
+      <div class="h">
+        <span class="rank">02</span>
+        <div><b>INSTALLING</b><i>Adding the app to this device</i></div>
+        <span class="ph">PWA</span>
+      </div>
+      <div class="fill-wrap">
+        <div class="bowl" aria-hidden="true">
+          <div class="water" id="water"></div>
+          <span class="pct" id="fillPct">0%</span>
+        </div>
+      </div>
+      <p id="fillCopy">Filling the app onto your home screen…</p>
     </div>
-    <div class="note" id="note">Chrome or Edge on Android can install in one tap. Safari needs Add to Home Screen.</div>
+
+    <div class="stage" id="stageGo">
+      <div class="h">
+        <span class="rank">03</span>
+        <div><b>APP READY</b><i>Open the installed app</i></div>
+        <span class="ph">PWA</span>
+      </div>
+      <img class="icon" src="pwa/island-weather-pwa/icons/icon-192.png" width="192" height="192" alt="Guardians of the Ocean">
+      <p>The ledger is on this device. Open the real app, or stay in this browser tab.</p>
+      <button type="button" class="go" id="goApp">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m0 0l-5-5m5 5l-5 5"/></svg>
+        GO TO APP
+      </button>
+      <button type="button" class="web" id="remainWeb">REMAIN ON THE WEBSITE</button>
+      <div class="note">Go to app opens the home-screen PWA. Remain on the website is the only way to use the ledger in this browser.</div>
+    </div>
   </article>
 <script>
 (function () {
   var APP = 'pwa/island-weather-pwa/index.html';
+  var WEB_KEY = 'goo-web-ok';
+  var PROTO = 'web+goo://open';
   var statusEl = document.getElementById('status');
   var btn = document.getElementById('installBtn');
   var iosHelp = document.getElementById('iosHelp');
+  var water = document.getElementById('water');
+  var fillPct = document.getElementById('fillPct');
   var deferred = null;
+  var filling = false;
   var ios = /iPad|iPhone|iPod/.test(navigator.userAgent);
   var standalone = matchMedia('(display-mode: standalone)').matches || !!navigator.standalone;
 
@@ -110,8 +183,23 @@
     statusEl.classList.toggle('warn', !!warn);
   }
 
+  function show(id) {
+    ['stageInstall', 'stageFill', 'stageGo'].forEach(function (key) {
+      document.getElementById(key).classList.toggle('on', key === id);
+    });
+  }
+
+  function allowWebsite() {
+    try { sessionStorage.setItem(WEB_KEY, '1'); } catch (e) {}
+  }
+
+  function appUrl(web) {
+    var url = new URL(APP, location.href);
+    if (web) url.searchParams.set('web', '1');
+    return url.href;
+  }
+
   if (standalone) {
-    setStatus('App already installed — opening…');
     location.replace(APP);
     return;
   }
@@ -126,6 +214,29 @@
     navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(function () {});
   }
 
+  function runFill(done) {
+    if (filling) return;
+    filling = true;
+    show('stageFill');
+    var t0 = performance.now();
+    var dur = 2400;
+    function tick(now) {
+      var p = Math.min(1, (now - t0) / dur);
+      var eased = 1 - Math.pow(1 - p, 3);
+      var pct = Math.round(eased * 100);
+      fillPct.textContent = pct + '%';
+      fillPct.classList.toggle('light', pct >= 52);
+      water.style.height = (eased * 100) + '%';
+      if (p < 1) requestAnimationFrame(tick);
+      else done();
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function afterInstalled() {
+    runFill(function () { show('stageGo'); });
+  }
+
   window.addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault();
     deferred = e;
@@ -134,10 +245,16 @@
   });
 
   window.addEventListener('appinstalled', function () {
-    setStatus('Installed. Opening the app…');
-    btn.disabled = true;
-    setTimeout(function () { location.replace(APP); }, 400);
+    afterInstalled();
   });
+
+  if (navigator.getInstalledRelatedApps) {
+    navigator.getInstalledRelatedApps().then(function (apps) {
+      if (!apps || !apps.length || filling) return;
+      if (!document.getElementById('stageInstall').classList.contains('on')) return;
+      show('stageGo');
+    }).catch(function () {});
+  }
 
   btn.addEventListener('click', function () {
     if (ios) {
@@ -153,7 +270,7 @@
     deferred.prompt();
     deferred.userChoice.then(function (choice) {
       if (choice.outcome === 'accepted') {
-        setStatus('Installing… stay here until the app icon appears.');
+        afterInstalled();
       } else {
         setStatus('Install cancelled. Tap Install App again to add it as an app.', true);
         btn.disabled = false;
@@ -162,8 +279,28 @@
     });
   });
 
+  document.getElementById('goApp').addEventListener('click', function () {
+    var hidden = false;
+    function left() { hidden = document.hidden; }
+    document.addEventListener('visibilitychange', left);
+    try { location.href = PROTO; } catch (e) {}
+    setTimeout(function () {
+      if (document.hidden || hidden) return;
+      var w = window.open(appUrl(false), '_blank', 'noopener');
+      if (!w) {
+        document.querySelector('#stageGo p').textContent =
+          'Tap the Guardians icon on your home screen to open the real app.';
+      }
+    }, 650);
+  });
+
+  document.getElementById('remainWeb').addEventListener('click', function () {
+    allowWebsite();
+    location.replace(appUrl(true));
+  });
+
   setTimeout(function () {
-    if (standalone || deferred || ios) return;
+    if (standalone || deferred || ios || filling) return;
     setStatus('Waiting for the browser install prompt… tap Install App when it lights up.', true);
   }, 2500);
 })();

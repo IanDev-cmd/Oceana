@@ -656,11 +656,32 @@ function buildCard(c, idx){
     '<div class="shot" style="background:' + c.fall + '">' +
       pictureHtml(c, eager) +
     '</div>' +
-    '<span class="cap">' + c.l1 + '<br>' + c.l2 + '</span>';
+    '<span class="cap">' + c.l1 + '<br>' + c.l2 + '</span>' +
+    '<span class="card-x" role="button" aria-label="Remove ' + c.l1 + ' card">' +
+      '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+    '</span>';
   var im = b.querySelector('img');
   if(im) im.addEventListener('error', function(){ im.remove(); });
+  var x = b.querySelector('.card-x');
+  function dropCard(e){
+    e.preventDefault();
+    e.stopPropagation();
+    removePhotoCards(c.id);
+  }
+  x.addEventListener('click', dropCard);
+  x.addEventListener('pointerdown', function(e){ e.stopPropagation(); });
   b.addEventListener('click', function(){ if(moved){ moved = false; return; } open(c, b); });
   return b;
+}
+
+function removePhotoCards(id){
+  if(openState) close();
+  [].slice.call(track.querySelectorAll('.card[data-id="' + id + '"]')).forEach(function(el){
+    el.remove();
+  });
+  pitch = sizeCards();
+  var n = track.querySelectorAll('.card').length;
+  loopLen = pitch * Math.max(1, Math.floor(n / 2) || n);
 }
 
 function hStrip(){
@@ -837,6 +858,12 @@ function close(){
 }
 window.closePhotoCard = close;
 document.getElementById('back').addEventListener('click', close);
+var photoClose = document.getElementById('photoClose');
+if(photoClose) photoClose.addEventListener('click', function(e){
+  e.preventDefault();
+  e.stopPropagation();
+  close();
+});
 addEventListener('keydown', function(e){
   if(e.key !== 'Escape') return;
   var ov = document.getElementById('terraOverlay');

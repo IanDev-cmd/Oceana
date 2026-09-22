@@ -25,7 +25,8 @@
   if (typeof window.fitGooPwa === 'function') window.fitGooPwa();
 
   var ICONS = [
-    { id:'globe', label:'3D Earth', svg:'<circle cx="12" cy="12" r="9" stroke-width="1.4"/><ellipse cx="12" cy="12" rx="4" ry="9" stroke-width="1.4"/><path d="M3 12h18" stroke-width="1.4"/>', open:'globe' },
+    { id:'globe', label:'3D Earth', svg:'<circle cx="12" cy="12" r="9" stroke-width="1.4"/><ellipse cx="12" cy="12" rx="4" ry="9" stroke-width="1.4"/><path d="M3 12h18" stroke-width="1.4"/>',
+      card:{ rank:'00', title:'3D EARTH', sub:'Immersive globe desk', badge:'LIVE', kpis:[{n:'3D',l:'GLOBE'},{n:'10',l:'CITIES'},{n:'LIVE',l:'SPIN'}], fund:'Step into the full Earth desk — spin the planet, search coasts, and walk every node.', ctas:[{id:'immerse', label:'IMMERSE', view:'globe'},{id:'hash', label:'2D MAPS', cls:'hash', view:'world'}] } },
     { id:'audit', label:'Verified Audit Trail', svg:'<path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3Z" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>',
       card:{ rank:'01', title:'VERIFIED AUDIT', sub:'Hedera consensus', badge:'LIVE', kpis:[{n:'100%',l:'IMMUTABLE'},{n:'48.2k',l:'CHECKS'},{n:'3.2s',l:'FINALITY'}], fund:'On-chain state proofs across 8 countries', ctas:[{id:'openMap', label:'OPEN MAP', view:'map'},{id:'hash', label:'HASHSCAN', cls:'hash', view:'map'}] } },
     { id:'vault', label:'Secure Asset Vault', svg:'<rect x="5" y="11" width="14" height="9" rx="2" stroke-width="1.4"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke-width="1.4"/><circle cx="12" cy="15.5" r="1.2" stroke-width="1.4"/>',
@@ -171,12 +172,13 @@
 
   ICONS.forEach(function (item, i) {
     var btn = document.createElement('button');
-    btn.className = 'tile' + (item.pay ? ' active' : '');
+    btn.className = 'tile' + (item.id === 'globe' ? ' active glow' : '');
     btn.setAttribute('aria-label', item.label);
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none">' + item.svg + '</svg>';
     btn.addEventListener('click', function () {
-      grid.querySelectorAll('.tile').forEach(function (t) { t.classList.remove('active'); });
+      grid.querySelectorAll('.tile').forEach(function (t) { t.classList.remove('active', 'glow'); });
       btn.classList.add('active');
+      if (item.id === 'globe') btn.classList.add('glow');
       if (item.open) {
         openWebView(item.open);
         return;
@@ -186,6 +188,8 @@
     });
     grid.appendChild(btn);
   });
+
+  showCard(ICONS[0]);
 
   var satPeek = document.getElementById('satPeek');
   if (satPeek) {
@@ -197,6 +201,4 @@
       img.addEventListener('error', function () { img.style.display = 'none'; });
     });
   }
-
-  bindPay();
 })();
