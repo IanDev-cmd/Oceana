@@ -654,7 +654,7 @@ html.mobile .gsearch{ width:min(440px, 72vw); }
 @keyframes gooBob{ 50%{ transform:translateY(-6px); } }
 
 .pwa-frame{
-  position:fixed; inset:0; z-index:60; display:none; background:#041018;
+  position:fixed; inset:0; z-index:60; display:none; background:#0b1210;
 }
 .pwa-frame.show{ display:block; }
 .pwa-frame iframe{ width:100%; height:100%; border:0; }
@@ -845,20 +845,27 @@ html.mobile .gsearch{ width:min(440px, 72vw); }
 .welcome-ask{
   position:fixed; inset:0; z-index:360;
   display:flex; align-items:center; justify-content:center;
-  padding:20px 16px; pointer-events:auto;
+  padding:max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  pointer-events:auto;
   background:transparent;
 }
 .welcome-card{
+  --wc-s:1;
   position:relative;
-  width:min(474px, calc(100vw - 28px));
-  aspect-ratio:474 / 276;
-  height:auto;
+  width:calc(474px * var(--wc-s));
+  height:calc(276px * var(--wc-s));
   background:transparent;
   color:#0d0f0c;
   font-family:'Space Grotesk',sans-serif;
   overflow:visible;
   transform-origin:center center;
   will-change:transform, opacity;
+}
+.welcome-inner{
+  position:absolute; left:0; top:0;
+  width:474px; height:276px;
+  transform:scale(var(--wc-s));
+  transform-origin:top left;
 }
 .welcome-card.fly{
   transition:transform .95s cubic-bezier(.22,.82,.2,1), opacity .85s ease;

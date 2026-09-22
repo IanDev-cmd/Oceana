@@ -423,11 +423,6 @@ document.addEventListener('pointerover', function(e){
   }
   window.openUxCard = openCard;
   window.closeUxCard = closeCard;
-  var gWallet = document.getElementById('gWallet');
-  if (gWallet) gWallet.addEventListener('click', function (e) {
-    e.stopPropagation();
-    openCard('wallet');
-  });
 
   function closeLedgerSheet(){
     if (!ledgerSheet) return;

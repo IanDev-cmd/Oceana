@@ -55,23 +55,76 @@
   var iframe = document.getElementById('pwaIframe');
   var grid = document.getElementById('iconGrid');
   var host = document.getElementById('pwaFeatureCard') || document.getElementById('pwaPayCard');
-  if (!grid || !loadEl || !frameEl || !iframe) return;
+  if (!grid || !loadEl || !frameEl) return;
 
-  function openWebView(view){
+  var pendingView = null;
+  var currentView = '';
+
+  function hideView() {
+    pendingView = null;
+    currentView = '';
+    loadEl.classList.remove('show');
+    frameEl.classList.remove('show');
+    if (iframe) {
+      iframe.remove();
+      iframe = null;
+    }
+  }
+
+  function openWebView(view, fromPop) {
+    view = view || 'globe';
+    pendingView = view;
     loadEl.classList.add('show');
-    Sound.click();
+    if (Sound) Sound.click();
+    if (iframe) {
+      iframe.remove();
+      iframe = null;
+    }
+    iframe = document.createElement('iframe');
+    iframe.id = 'pwaIframe';
+    iframe.title = 'Guardians maps';
+    iframe.addEventListener('load', function () {
+      if (!frameEl.classList.contains('show')) return;
+      try {
+        var href = iframe.contentWindow.location.href;
+        if (!href || href.indexOf('about:blank') === 0) hideView();
+      } catch (e) {}
+    });
     iframe.src = APP + '?embed=1&from=pwa&view=' + encodeURIComponent(view);
-    setTimeout(function(){
+    frameEl.appendChild(iframe);
+    setTimeout(function () {
+      if (pendingView !== view) return;
+      currentView = view;
       frameEl.classList.add('show');
       loadEl.classList.remove('show');
-      if (Notify) Notify.toast({ tone:'blue', title:'Live feed', sub:'Mobile 3D / 2D maps from the web app.', n:'📡' });
     }, 700);
+    if (!fromPop) {
+      try {
+        history.pushState({ pwa: 'view', view: view }, '', '#/' + encodeURIComponent(view));
+      } catch (e) {}
+    }
   }
   if (window.GOO) window.GOO.openPwaView = openWebView;
 
-  document.getElementById('pwaCloseView') && document.getElementById('pwaCloseView').addEventListener('click', function(){
-    frameEl.classList.remove('show');
-    iframe.src = 'about:blank';
+  function pwaPop(e) {
+    var s = (e && e.state) || history.state || {};
+    if (s.goo === 'wallet') return;
+    if (s.pwa === 'view' && s.view) {
+      if (currentView !== s.view || !frameEl.classList.contains('show')) openWebView(s.view, true);
+      return;
+    }
+    hideView();
+  }
+  addEventListener('popstate', pwaPop);
+  try {
+    if (!history.state || (history.state.pwa == null && history.state.goo == null)) {
+      history.replaceState({ pwa: 'home' }, '', location.pathname + location.search);
+    }
+  } catch (e) {}
+
+  document.getElementById('pwaCloseView') && document.getElementById('pwaCloseView').addEventListener('click', function () {
+    if (history.state && history.state.pwa === 'view') history.back();
+    else hideView();
   });
   var pwaComp = document.getElementById('pwaCompassBtn');
       if (pwaComp) pwaComp.addEventListener('click', function(){
@@ -180,6 +233,12 @@
       grid.querySelectorAll('.tile').forEach(function (t) { t.classList.remove('active', 'glow'); });
       btn.classList.add('active');
       if (item.id === 'globe') btn.classList.add('glow');
+      if (item.id === 'wallet') {
+        showCard(item);
+        if (window.GOO && GOO.openWalletCard) GOO.openWalletCard();
+        if (Sound) Sound.click();
+        return;
+      }
       if (item.open) {
         openWebView(item.open);
         return;

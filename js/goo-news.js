@@ -320,7 +320,9 @@
         });
       }
       if (canPush()) {
-        setTimeout(function () { News.prompt(); }, 700);
+        var tutSeen = false;
+        try { tutSeen = !!localStorage.getItem('goo-tutorial-v3'); } catch (e) {}
+        if (tutSeen) News.schedulePrompt(55 * 1000);
         navigator.serviceWorker && navigator.serviceWorker.ready.then(function (reg) {
           if (reg.periodicSync && reg.periodicSync.register) {
             reg.periodicSync.register('goo-news', { minInterval: 60 * 60 * 1000 }).catch(function () {});
@@ -328,7 +330,8 @@
         }).catch(function () {});
       }
     },
-    prompt: function () {
+    prompt: function (opts) {
+      opts = opts || {};
       if (typeof document === 'undefined' || typeof Notification === 'undefined') return;
       if (!canPush()) return;
       if (Notification.permission === 'granted') {
@@ -336,6 +339,7 @@
         return;
       }
       if (Notification.permission === 'denied') return;
+      if (!opts.force && tourBusy()) return;
       if (document.getElementById('nPrompt')) return;
       try {
         var until = +localStorage.getItem('goo-news-prompt-later');
@@ -370,8 +374,24 @@
         try { localStorage.setItem('goo-news-prompt-later', String(Date.now() + 3 * 24 * 60 * 60 * 1000)); } catch (err) {}
         hidePrompt();
       });
-    }
+    },
+    schedulePrompt: function (delay) {
+      clearTimeout(News._promptTimer);
+      News._promptTimer = setTimeout(function tick() {
+        if (tourBusy()) {
+          News._promptTimer = setTimeout(tick, 8000);
+          return;
+        }
+        News.prompt();
+      }, delay == null ? 55 * 1000 : delay);
+    },
+    hidePrompt: hidePrompt
   };
+
+  function tourBusy() {
+    if (typeof document === 'undefined') return false;
+    return !!(document.querySelector('.tut-ask') || document.body.classList.contains('tut-on'));
+  }
 
   function hidePrompt() {
     var el = document.getElementById('nPrompt');

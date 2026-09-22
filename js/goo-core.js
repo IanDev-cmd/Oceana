@@ -234,7 +234,7 @@
           root.GOO.News.poll({ push: true });
           return;
         }
-        root.GOO.News.prompt();
+        root.GOO.News.prompt({ force: true });
         return;
       }
       if (this.askedNative || !('Notification' in window) || Notification.permission !== 'default') return;
@@ -257,9 +257,211 @@
     }
   };
 
+  var WELCOME_KEY = 'goo-welcome-token-v2';
+  var WELCOME_PATH = 'M28 0H232C256 0 252 28 276 28H446A28 28 0 0 1 474 56V248A28 28 0 0 1 446 276H276C252 276 252 248 228 248H28A28 28 0 0 1 0 220V28A28 28 0 0 1 28 0Z';
+  var walletTimers = [];
+  var walletResize = null;
+
+  function clearWalletTimers() {
+    walletTimers.forEach(function (t) { clearTimeout(t); });
+    walletTimers = [];
+    if (walletResize) {
+      removeEventListener('resize', walletResize);
+      if (window.visualViewport) visualViewport.removeEventListener('resize', walletResize);
+      walletResize = null;
+    }
+  }
+
+  function walletFlyTarget() {
+    var ids = ['terraWallet', 'gWallet'];
+    var i, el, r;
+    for (i = 0; i < ids.length; i++) {
+      el = document.getElementById(ids[i]);
+      if (!el) continue;
+      r = el.getBoundingClientRect();
+      if (r.width > 2 && r.height > 2) return el;
+    }
+    return document.querySelector('.tile[aria-label="Wallet"]');
+  }
+
+  function fitWalletCard(card) {
+    var vv = window.visualViewport;
+    var vw = vv ? vv.width : innerWidth;
+    var vh = vv ? vv.height : innerHeight;
+    var padX = vw < 400 ? 16 : 24;
+    var padY = vh < 500 ? 16 : 24;
+    var s = Math.min(1, (vw - padX) / 474, (vh - padY) / 276);
+    if (s < 0.42) s = 0.42;
+    card.style.setProperty('--wc-s', String(s));
+  }
+
+  function openWalletCard(opts) {
+    opts = opts || {};
+    var first = !!opts.first;
+    var existing = document.getElementById('welcomeToken');
+    if (existing) existing.remove();
+    clearWalletTimers();
+
+    var wrap = document.createElement('div');
+    wrap.id = 'welcomeToken';
+    wrap.className = 'welcome-ask';
+    var nums = [];
+    var i;
+    for (i = 0; i <= 100; i += 5) nums.push((i / 10).toFixed(1));
+    wrap.innerHTML =
+      '<article class="welcome-card" role="dialog" aria-label="Welcome token">' +
+        '<div class="welcome-inner">' +
+          '<svg class="welcome-geo" viewBox="0 0 474 276" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
+            '<path class="welcome-body" d="' + WELCOME_PATH + '"/>' +
+            '<g class="welcome-topo">' +
+              '<path d="M292 62H428Q446 62 446 80V166"/>' +
+              '<path d="M304 74H416Q432 74 432 90V154"/>' +
+              '<path d="M316 86H404Q418 86 418 100V142"/>' +
+              '<path d="M328 98H392Q404 98 404 110V130"/>' +
+            '</g>' +
+          '</svg>' +
+          '<button type="button" class="welcome-x" id="welcomeClose" aria-label="Close">' +
+            '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+          '</button>' +
+          '<div class="welcome-ui">' +
+            '<div class="welcome-kicker">Welcome Token</div>' +
+            '<div class="welcome-amt"><span class="welcome-cur">$</span><span class="welcome-reel"><span class="welcome-track" id="welcomeTrack">' +
+              nums.map(function (n) { return '<b>' + n + '</b>'; }).join('') +
+            '</span></span></div>' +
+            '<p class="welcome-copy">You have received <b>10.0 $</b> as a welcome token<br>Funding for Ocean Cleaning Activities</p>' +
+            '<div class="welcome-meta"><div><i>Funding</i><b>Ocean cleaning</b></div><div><i>Status</i><b class="ok" id="welcomeStatus">Posting</b></div></div>' +
+          '</div>' +
+          '<button type="button" class="welcome-add" id="welcomeWallet">Wallet</button>' +
+        '</div>' +
+      '</article>';
+    document.body.appendChild(wrap);
+    var card = wrap.querySelector('.welcome-card');
+    var track = wrap.querySelector('#welcomeTrack');
+    var statusEl = wrap.querySelector('#welcomeStatus');
+    var closed = false;
+    fitWalletCard(card);
+    walletResize = function () { if (!closed) fitWalletCard(card); };
+    addEventListener('resize', walletResize);
+    if (window.visualViewport) visualViewport.addEventListener('resize', walletResize);
+
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        if (!track) return;
+        var last = track.querySelector('b:last-child');
+        var y = last ? last.offsetTop : 0;
+        track.style.transform = 'translateY(-' + y + 'px)';
+      });
+    });
+    walletTimers.push(setTimeout(function () {
+      if (closed) return;
+      if (statusEl) statusEl.textContent = 'Success';
+      Sound.success();
+    }, 2400));
+
+    function persistFirst() {
+      if (!first) return;
+      try { localStorage.setItem(WELCOME_KEY, '1'); } catch (e) {}
+    }
+    function dropHist() {
+      if (wrap.dataset.hist === '1') {
+        wrap.dataset.hist = '0';
+        try { history.back(); } catch (e) {}
+      }
+    }
+    function flyAway() {
+      if (closed) return;
+      closed = true;
+      persistFirst();
+      dropHist();
+      var target = walletFlyTarget();
+      var reduce = Device.reduced;
+      if (!card || !target || reduce) {
+        wrap.remove();
+        clearWalletTimers();
+        return;
+      }
+      var cr = card.getBoundingClientRect();
+      var tr = target.getBoundingClientRect();
+      var dx = (tr.left + tr.width / 2) - (cr.left + cr.width / 2);
+      var dy = (tr.top + tr.height / 2) - (cr.top + cr.height / 2);
+      var s = Math.max(0.08, Math.min(tr.width / cr.width, tr.height / cr.height));
+      wrap.style.pointerEvents = 'none';
+      card.classList.add('fly');
+      card.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ')';
+      card.style.opacity = '0';
+      target.classList.add('welcome-catch');
+      setTimeout(function () { target.classList.remove('welcome-catch'); }, 800);
+      setTimeout(function () {
+        wrap.remove();
+        clearWalletTimers();
+      }, 980);
+    }
+    function dismissNow(fromPop) {
+      if (closed) return;
+      closed = true;
+      persistFirst();
+      wrap.remove();
+      clearWalletTimers();
+      if (!fromPop) dropHist();
+    }
+    if (first) walletTimers.push(setTimeout(flyAway, 5000));
+    wrap.querySelector('#welcomeClose').addEventListener('click', function () { dismissNow(false); });
+    wrap.querySelector('#welcomeWallet').addEventListener('click', function () {
+      dismissNow(true);
+      try {
+        if (history.state && history.state.goo === 'wallet') {
+          history.replaceState({ pwa: 'home' }, '');
+        }
+      } catch (e) {}
+      if (window.openUxCard) window.openUxCard('wallet');
+      else if (window.GOO && typeof GOO.openPwaView === 'function') GOO.openPwaView('wallet');
+    });
+    wrap._gooClose = dismissNow;
+    if (!opts.fromPop) {
+      try {
+        history.pushState({ goo: 'wallet' }, '');
+        wrap.dataset.hist = '1';
+      } catch (e) {}
+    }
+  }
+
+  function dismissWalletCard(fromPop) {
+    var wrap = document.getElementById('welcomeToken');
+    if (wrap && typeof wrap._gooClose === 'function') wrap._gooClose(!!fromPop);
+  }
+
+  addEventListener('popstate', function () {
+    var wrap = document.getElementById('welcomeToken');
+    if (wrap && typeof wrap._gooClose === 'function') wrap._gooClose(true);
+  });
+
+  function bindDollarButtons() {
+    function hook(el) {
+      if (!el || el.dataset.gooWallet) return;
+      el.dataset.gooWallet = '1';
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        Sound.click();
+        openWalletCard();
+      });
+    }
+    hook(document.getElementById('gWallet'));
+    hook(document.getElementById('terraWallet'));
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindDollarButtons);
+  else bindDollarButtons();
+
   root.GOO = root.GOO || {};
   root.GOO.Device = Device;
   root.GOO.Sound = Sound;
   root.GOO.Notify = Notify;
   root.GOO.esc = esc;
+  root.GOO.openWalletCard = openWalletCard;
+  root.GOO.closeWalletCard = dismissWalletCard;
+  root.GOO.maybeWelcomeToken = function () {
+    if (document.body.classList.contains('tut-on')) return;
+    try { if (localStorage.getItem(WELCOME_KEY) === '1') return; } catch (e) {}
+    openWalletCard({ first: true });
+  };
 })(window);

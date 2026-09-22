@@ -854,106 +854,8 @@
   window.openTerraWorld = function(){ openMap('world', { world:true }); };
   window.closeTerraRoadmap = closeMap;
 
-  var WELCOME_KEY = 'goo-welcome-token-v2';
-  var WELCOME_PATH = 'M28 0H232C256 0 252 28 276 28H446A28 28 0 0 1 474 56V248A28 28 0 0 1 446 276H276C252 276 252 248 228 248H28A28 28 0 0 1 0 220V28A28 28 0 0 1 28 0Z';
-  function walletFlyTarget() {
-    var a = document.getElementById('terraWallet');
-    if (a && a.getBoundingClientRect().width) return a;
-    var b = document.getElementById('gWallet');
-    if (b && b.getBoundingClientRect().width) return b;
-    return document.querySelector('.tile[aria-label="Wallet"]');
-  }
   function maybeWelcomeToken() {
-    if (document.body.classList.contains('tut-on')) return;
-    try { if (localStorage.getItem(WELCOME_KEY) === '1') return; } catch (e) {}
-    if (document.getElementById('welcomeToken')) return;
-    var wrap = document.createElement('div');
-    wrap.id = 'welcomeToken';
-    wrap.className = 'welcome-ask';
-    var nums = [];
-    var i;
-    for (i = 0; i <= 100; i += 5) nums.push((i / 10).toFixed(1));
-    wrap.innerHTML =
-      '<article class="welcome-card" role="dialog" aria-label="Welcome token">' +
-        '<svg class="welcome-geo" viewBox="0 0 474 276" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
-          '<path class="welcome-body" d="' + WELCOME_PATH + '"/>' +
-          '<g class="welcome-topo">' +
-            '<path d="M292 62H428Q446 62 446 80V166"/>' +
-            '<path d="M304 74H416Q432 74 432 90V154"/>' +
-            '<path d="M316 86H404Q418 86 418 100V142"/>' +
-            '<path d="M328 98H392Q404 98 404 110V130"/>' +
-          '</g>' +
-        '</svg>' +
-        '<button type="button" class="welcome-x" id="welcomeClose" aria-label="Close">' +
-          '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
-        '</button>' +
-        '<div class="welcome-ui">' +
-          '<div class="welcome-kicker">Welcome Token</div>' +
-          '<div class="welcome-amt"><span class="welcome-cur">$</span><span class="welcome-reel"><span class="welcome-track" id="welcomeTrack">' +
-            nums.map(function (n) { return '<b>' + n + '</b>'; }).join('') +
-          '</span></span></div>' +
-          '<p class="welcome-copy">You have received <b>10.0 $</b> as a welcome token<br>Funding for Ocean Cleaning Activities</p>' +
-          '<div class="welcome-meta"><div><i>Funding</i><b>Ocean cleaning</b></div><div><i>Status</i><b class="ok" id="welcomeStatus">Posting</b></div></div>' +
-        '</div>' +
-        '<button type="button" class="welcome-add" id="welcomeWallet">Wallet</button>' +
-      '</article>';
-    document.body.appendChild(wrap);
-    var card = wrap.querySelector('.welcome-card');
-    var track = wrap.querySelector('#welcomeTrack');
-    var statusEl = wrap.querySelector('#welcomeStatus');
-    var closed = false;
-    var flyTimer;
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        var last = track.querySelector('b:last-child');
-        var y = last ? last.offsetTop : 0;
-        track.style.transform = 'translateY(-' + y + 'px)';
-      });
-    });
-    setTimeout(function () {
-      if (closed) return;
-      if (statusEl) statusEl.textContent = 'Success';
-      if (window.GOO && GOO.Sound) GOO.Sound.success();
-    }, 2400);
-    function persist() {
-      try { localStorage.setItem(WELCOME_KEY, '1'); } catch (e) {}
-    }
-    function flyAway() {
-      if (closed) return;
-      closed = true;
-      persist();
-      var target = walletFlyTarget();
-      var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (!card || !target || reduce) {
-        wrap.remove();
-        return;
-      }
-      var cr = card.getBoundingClientRect();
-      var tr = target.getBoundingClientRect();
-      var dx = (tr.left + tr.width / 2) - (cr.left + cr.width / 2);
-      var dy = (tr.top + tr.height / 2) - (cr.top + cr.height / 2);
-      var s = Math.max(0.08, Math.min(tr.width / cr.width, tr.height / cr.height));
-      wrap.style.pointerEvents = 'none';
-      card.classList.add('fly');
-      card.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ')';
-      card.style.opacity = '0';
-      target.classList.add('welcome-catch');
-      setTimeout(function () { target.classList.remove('welcome-catch'); }, 800);
-      setTimeout(function () { wrap.remove(); }, 980);
-    }
-    function dismissNow() {
-      if (closed) return;
-      closed = true;
-      persist();
-      if (flyTimer) clearTimeout(flyTimer);
-      wrap.remove();
-    }
-    flyTimer = setTimeout(flyAway, 5000);
-    wrap.querySelector('#welcomeClose').addEventListener('click', dismissNow);
-    wrap.querySelector('#welcomeWallet').addEventListener('click', function () {
-      if (window.openUxCard) window.openUxCard('wallet');
-      flyAway();
-    });
+    if (window.GOO && typeof GOO.maybeWelcomeToken === 'function') GOO.maybeWelcomeToken();
   }
 
   if(location.hash === '#roadmap') setTimeout(openMap, 240);
@@ -971,13 +873,6 @@
   }
 
   document.getElementById('terraClose').addEventListener('click', closeMap);
-  var terraWallet = document.getElementById('terraWallet');
-  if (terraWallet) {
-    terraWallet.addEventListener('click', function () {
-      if (window.GOO && GOO.Sound) GOO.Sound.click();
-      if (window.openUxCard) window.openUxCard('wallet');
-    });
-  }
   document.getElementById('terraZoomIn').addEventListener('click', function(){ if(map) map.zoomIn(); });
   document.getElementById('terraZoomOut').addEventListener('click', function(){ if(map) map.zoomOut(); });
   document.getElementById('terraCompass').addEventListener('click', function(){

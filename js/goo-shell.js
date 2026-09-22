@@ -185,6 +185,7 @@
           '</div>' +
         '</article>';
       document.body.appendChild(ov);
+      if (GOO.News && GOO.News.hidePrompt) GOO.News.hidePrompt();
       requestAnimationFrame(function () { ov.classList.add('show'); });
       function bindStore(id) {
         var btn = ov.querySelector('#' + id);
@@ -207,6 +208,7 @@
         Sound.click();
         if (!opts.fromInstall) Tutorial.stored('skip');
         ov.remove();
+        if (GOO.News && GOO.News.schedulePrompt) GOO.News.schedulePrompt(55 * 1000);
       });
     },
     replay: function () {
@@ -709,6 +711,7 @@
       this.veil = this.card = this.pointer = this.progress = null;
       if (!silent) {
         Notify.toast({ tone: 'green', title: 'You are ready', sub: 'Earth, maps, crew and the ledger are live.', n: '🌊' });
+        if (GOO.News && GOO.News.schedulePrompt) GOO.News.schedulePrompt(1800);
       }
     }
   };
@@ -789,8 +792,16 @@
       var back = document.createElement('a');
       back.id = 'pwaBack';
       back.className = 'pwa-back';
-      back.href = Device.iconBase + 'pwa/island-weather-pwa/index.html';
+      back.href = Device.iconBase + 'pwa/island-weather-pwa/index.html?web=1';
       back.textContent = '← Ledger';
+      back.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (window.history.length > 1) {
+          history.back();
+          return;
+        }
+        location.replace(back.href);
+      });
       document.body.appendChild(back);
     }
   }
