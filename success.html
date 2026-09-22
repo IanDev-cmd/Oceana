@@ -16,7 +16,7 @@
     }
     .card {
       width: min(92vw, 480px); background: #fff; padding: 36px 32px 28px;
-      box-shadow: 0 24px 60px rgba(0,16,40,.12);
+      border: 1px solid #e4e8e2;
     }
     h1 { margin: 0 0 8px; font-size: 28px; }
     p { margin: 0 0 18px; color: var(--muted); line-height: 1.5; }
@@ -31,11 +31,13 @@
     dl { display: grid; grid-template-columns: 120px 1fr; gap: 8px 12px; margin: 0 0 24px; font-size: 14px; }
     dt { color: var(--muted); font-weight: 700; }
     dd { margin: 0; font-weight: 700; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; }
     a.btn {
       display: inline-flex; align-items: center; justify-content: center;
       min-height: 48px; padding: 0 18px; background: var(--ok); color: #fff;
       text-decoration: none; font-weight: 700; border-radius: 10px;
     }
+    a.btn.ghost { background: #e8e8e6; color: #12181f; }
     .note { font-size: 12px; color: var(--muted); margin-top: 16px; }
   </style>
 </head>
@@ -49,17 +51,28 @@
       <dt>Amount</dt><dd id="amount">—</dd>
       <dt>Status</dt><dd id="paidStatus">pending</dd>
     </dl>
-    <a class="btn" href="save-the-earth (4).html">Back to Wallet Overview</a>
+    <div class="row">
+      <a class="btn" id="walletLink" href="desktop.html">Back to Wallet Overview</a>
+      <a class="btn ghost" id="pwaLink" href="pwa/island-weather-pwa/index.html" hidden>Open PWA ledger</a>
+    </div>
     <p class="note">If this stays pending for more than a minute, the webhook endpoint is not receiving events yet. The charge is still held by Stripe until fulfillment is confirmed server-side.</p>
   </main>
-  <script src="js/goo-config.js"></script>
+  <script src="js/api/config.js"></script>
+  <script src="js/api/client.js"></script>
   <script>
     (function () {
       var params = new URLSearchParams(location.search);
       var sessionId = params.get('session_id') || '';
+      var fromPwa = params.get('from') === 'pwa';
       var statusEl = document.getElementById('status');
       var copy = document.getElementById('copy');
       var summary = document.getElementById('summary');
+      var pwaLink = document.getElementById('pwaLink');
+      var walletLink = document.getElementById('walletLink');
+      if (fromPwa) {
+        pwaLink.hidden = false;
+        walletLink.href = 'desktop.html?from=pwa&view=wallet';
+      }
       var tries = 0;
       function money(cents, currency) {
         try {
@@ -77,6 +90,7 @@
           document.getElementById('orderId').textContent = payload.orderId;
           document.getElementById('amount').textContent = money(payload.amount, payload.currency);
           document.getElementById('paidStatus').textContent = payload.status;
+          if (payload.email && window.GooApi) window.GooApi.persistEmail(payload.email);
         }
         copy.textContent = ok
           ? 'Stripe confirmed this restoration credit. Fulfillment was recorded by the webhook, not this redirect.'
@@ -84,12 +98,17 @@
       }
       async function poll() {
         if (!sessionId) { done(false, null); copy.textContent = 'Missing session_id.'; return; }
-        var base = String(window.GOO_API || '').replace(/\/$/, '');
-        if (!base) { done(false, null); return; }
+        if (!window.GooApi || !window.GooApi.getOrderStatus) { done(false, null); return; }
         try {
-          var res = await fetch(base + '/api/orders/status?session_id=' + encodeURIComponent(sessionId));
-          var body = await res.json();
+          var body = await window.GooApi.getOrderStatus(sessionId);
+          if (body.email && window.GooApi) window.GooApi.persistEmail(body.email);
           if (body.fulfilled) { done(true, body); return; }
+          if (body.found) {
+            summary.hidden = false;
+            document.getElementById('orderId').textContent = body.orderId;
+            document.getElementById('amount').textContent = money(body.amount, body.currency);
+            document.getElementById('paidStatus').textContent = body.status;
+          }
         } catch (e) {}
         tries += 1;
         if (tries < 20) setTimeout(poll, 1500);

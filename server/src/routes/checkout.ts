@@ -1,15 +1,18 @@
 import { z } from "zod";
 import type { Request, Response, NextFunction } from "express";
 import type Stripe from "stripe";
-import type { Env } from "./env.js";
-import { prisma } from "./db.js";
-import { HttpError } from "./http.js";
+import type { Env } from "../env.js";
+import { HttpError } from "../http.js";
+import { normalizeEmail } from "../domain/email.js";
+import { ensureStripeCustomer, upsertUserByEmail } from "../services/users.js";
+import { createOrderForSession, createPendingSubscription } from "../services/orders.js";
 
 const checkoutBody = z.object({
-  email: z.string().email(),
+  email: z.string().trim().toLowerCase().email(),
   mode: z.enum(["payment", "subscription"]).default("payment"),
   amount: z.number().int().min(50).max(1_000_000).optional(),
   currency: z.string().min(3).max(3).optional(),
+  source: z.enum(["desktop", "pwa"]).optional(),
 });
 
 function originFrom(env: Env): string {
@@ -24,49 +27,31 @@ export function createCheckoutHandler(stripe: Stripe, env: Env) {
         throw new HttpError(400, "Valid email is required");
       }
 
-      const { email, mode } = parsed.data;
+      const email = normalizeEmail(parsed.data.email);
+      if (!email) {
+        throw new HttpError(400, "Valid email is required");
+      }
+
+      const { mode, source } = parsed.data;
       const amount = parsed.data.amount ?? env.CHECKOUT_AMOUNT_CENTS;
       const currency = (parsed.data.currency ?? env.CHECKOUT_CURRENCY).toLowerCase();
       const origin = originFrom(env);
+      const orderId = crypto.randomUUID();
+      const kind = mode === "subscription" ? "subscription_setup" : "payment";
 
-      const user = await prisma.user.upsert({
-        where: { email },
-        update: {},
-        create: { email },
-      });
+      const user = await upsertUserByEmail(email);
+      const stripeCustomerId = await ensureStripeCustomer(stripe, user);
 
-      let stripeCustomerId = user.stripeCustomerId;
-      if (!stripeCustomerId) {
-        const customer = await stripe.customers.create({
-          email,
-          metadata: { userId: user.id },
-        });
-        stripeCustomerId = customer.id;
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { stripeCustomerId },
-        });
-      }
-
-      const pending = await prisma.order.create({
-        data: {
-          userId: user.id,
-          stripeSessionId: `pending_${crypto.randomUUID()}`,
-          amount,
-          currency,
-          status: "pending",
-        },
-      });
-
+      const from = source === "pwa" ? "&from=pwa" : "";
       const sessionParams: Stripe.Checkout.SessionCreateParams = {
         mode,
         customer: stripeCustomerId,
         client_reference_id: user.id,
-        success_url: `${origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin}/cart.html`,
+        success_url: `${origin}/success.html?session_id={CHECKOUT_SESSION_ID}${from}`,
+        cancel_url: `${origin}/cancel.html`,
         metadata: {
           userId: user.id,
-          orderId: pending.id,
+          orderId,
         },
         line_items: [
           {
@@ -82,6 +67,12 @@ export function createCheckoutHandler(stripe: Stripe, env: Env) {
           },
         ],
       };
+
+      if (mode === "payment") {
+        sessionParams.payment_intent_data = {
+          metadata: { userId: user.id, orderId },
+        };
+      }
 
       if (mode === "subscription") {
         sessionParams.line_items = [
@@ -104,24 +95,25 @@ export function createCheckoutHandler(stripe: Stripe, env: Env) {
         throw new HttpError(502, "Stripe did not return a checkout URL");
       }
 
-      await prisma.order.update({
-        where: { id: pending.id },
-        data: { stripeSessionId: session.id },
+      await createOrderForSession({
+        id: orderId,
+        userId: user.id,
+        sessionId: session.id,
+        amount,
+        currency,
+        kind,
       });
 
       if (mode === "subscription") {
-        await prisma.subscription.create({
-          data: {
-            userId: user.id,
-            stripeSessionId: session.id,
-            amount,
-            currency,
-            status: "pending",
-          },
+        await createPendingSubscription({
+          userId: user.id,
+          sessionId: session.id,
+          amount,
+          currency,
         });
       }
 
-      res.json({ url: session.url, orderId: pending.id, sessionId: session.id });
+      res.json({ url: session.url, orderId, sessionId: session.id });
     } catch (err) {
       next(err);
     }

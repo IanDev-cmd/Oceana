@@ -47,12 +47,13 @@ Then open Wallet Overview and use **Checkout**.
 
 ## Routes
 
-- `POST /api/checkout` — authenticate (optional bearer), upsert user, create Stripe Customer, create Checkout Session, insert `pending` order, return `{ url }`
-- `POST /api/webhooks/stripe` — raw body + `constructEvent`, idempotent via `stripe_events.id`
-- `GET /api/balance` — Stripe Balance + paid/pending order aggregates for the wallet card
+- `POST /api/checkout` — authenticate (optional bearer), upsert user (lowercase email), create Stripe Customer, create Checkout Session first, insert `pending` order with that `session.id`, return `{ url, orderId, sessionId }`
+- `POST /api/webhooks/stripe` — raw body + `constructEvent`; claim event as `received`, fulfill, then mark `processed`. Failures stay `failed` and return 500 so Stripe retries.
+- `GET /api/ledger?email=` — `{ live, currency, fund, personal }` for desktop and PWA
 - `GET /api/orders/status?session_id=` — success-page polling (display only)
+- `GET /health` — `{ ok, db }`
 
-Webhook events: `checkout.session.completed`, `payment_intent.payment_failed`, `customer.subscription.deleted`.
+Webhook events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.expired`, `checkout.session.async_payment_failed`, `payment_intent.payment_failed`, `customer.subscription.deleted`.
 
 ## Deploy
 
@@ -61,6 +62,6 @@ Create a **separate** Render Web Service from `server/` (do not convert the stat
 - Build: `npm install && npx prisma generate && npm run build`
 - Start: `npx prisma migrate deploy && node dist/index.js`
 
-In the static site, set `js/goo-config.js` or `localStorage.goo-api` to that service URL.
+In the static site, set `js/api/config.js` or `localStorage.goo-api` to that service URL.
 
-React/Next.js copies of the button and App Router handlers live in `/stripe-ui` if you later wrap this UI in Next. The hosted product remains vanilla HTML.
+`stripe-ui/CheckoutButton.tsx` is a typed copy of the vanilla button and posts to this Express API. The hosted product remains vanilla HTML.

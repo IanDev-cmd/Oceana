@@ -23,9 +23,13 @@ export function CheckoutButton({
 
   async function onClick() {
     if (busy) return;
-    const trimmed = email.trim();
-    if (!trimmed) {
-      onError?.("Enter an email before checkout.");
+    const trimmed = email.trim().toLowerCase();
+    const emailOk =
+      /^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+.\-]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$/.test(
+        trimmed
+      );
+    if (!emailOk) {
+      onError?.("Enter a valid email before checkout.");
       return;
     }
     setBusy(true);

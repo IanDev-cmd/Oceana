@@ -280,6 +280,15 @@
     flex:0 0 auto;
   }
 
+  body[data-shell="pwa"] .sat-peek{
+    width: 28px;
+    height: 28px;
+    flex: 0 0 auto;
+    align-self: flex-end;
+    background-image: url('../../assets/3d/earth-atmos.jpg');
+  }
+  body[data-shell="pwa"] .sat-peek-cap{ display:none; }
+
   body[data-shell="pwa"] #pwaCompassBtn.compass-fab{
     position:relative;
     left:auto;
@@ -429,6 +438,16 @@
         </div>
       </article>
     </div>
+
+    <button type="button" class="sat-peek" id="satPeek" aria-label="Open satellite 2D maps">
+      <span class="sat-peek-grid" aria-hidden="true">
+        <img src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/1/0/0" alt="" width="256" height="256" decoding="async">
+        <img src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/1/0/1" alt="" width="256" height="256" decoding="async">
+        <img src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/1/1/0" alt="" width="256" height="256" decoding="async">
+        <img src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/1/1/1" alt="" width="256" height="256" decoding="async">
+      </span>
+      <span class="sat-peek-cap"><b>SATELLITE</b><i>2D MAPS</i></span>
+    </button>
 
     <div class="grid" id="iconGrid">
       <!-- tiles injected by script -->

@@ -770,30 +770,38 @@
     tourTimer = setTimeout(step, 400);
   }
 
-  function openMap(cityId){
-    if(pwaView() && window.GOO.Device.view === 'globe') return;
-    var id = (typeof cityId === 'string' && cityId) ? cityId : (window.__chosenCity || 'jakarta');
+  function openMap(cityId, opts){
+    opts = opts || {};
+    var worldOnly = !!(opts.world || cityId === 'world');
+    if(pwaView() && window.GOO.Device.view === 'globe' && !worldOnly) return;
+    var id = (!worldOnly && typeof cityId === 'string' && cityId && cityId !== 'world')
+      ? cityId
+      : (window.__chosenCity || 'jakarta');
     window.__chosenCity = id;
     var city = cityById(id);
-    if(!city || !city.ll) return;
+    if(!worldOnly && (!city || !city.ll)) return;
     var modal = document.getElementById('uxmodal');
     if(modal) modal.classList.remove('open');
     var appEl = document.getElementById('app');
     cinematic = true;
     stopTour();
     clearTimeout(idleTimer);
-    var skipGlobe = pwaView();
+    var skipGlobe = pwaView() || worldOnly;
     if(!skipGlobe && appEl) appEl.classList.add('globe-focus');
     var spinMs = skipGlobe ? 0 : (reducedMotion() ? 800 : 5000);
     window.__spinBoost = skipGlobe || reducedMotion() ? 0 : 0.042;
-    if(!skipGlobe && window.__globeLook) window.__globeLook(city.ll[0], city.ll[1]);
+    if(!skipGlobe && city && window.__globeLook) window.__globeLook(city.ll[0], city.ll[1]);
     var leafletReady = loadLeaflet().catch(function(){
       if(window.GOO && GOO.Notify) GOO.Notify.toast({ tone:'amber', title:'Map tiles', sub:'Leaflet failed to load. Check the network.', n:'!' });
     });
 
     function showWorldThenCity(){
       window.__spinBoost = 0;
-      if(window.GOO && GOO.Notify) GOO.Notify.toast({ tone:'green', title:'Roadmap live', sub:'Whole Earth, then ' + city.name + '.', n:'09' });
+      if(window.GOO && GOO.Notify){
+        GOO.Notify.toast(worldOnly
+          ? { tone:'green', title:'Satellite maps', sub:'World view — zoom in on any coast.', n:'2D' }
+          : { tone:'green', title:'Roadmap live', sub:'Whole Earth, then ' + city.name + '.', n:'09' });
+      }
       overlay.classList.add('open');
       overlay.setAttribute('aria-hidden','false');
       overlay.removeAttribute('inert');
@@ -803,13 +811,17 @@
         initMap();
         renderRoadmap();
         if(map){
-          map.setView([12, 20], 2, { animate:false });
+          map.setView([12, 20], worldOnly ? 1 : 2, { animate:false });
           map.invalidateSize();
         }
         setTimeout(function(){
           if(map){
             map.invalidateSize();
-            flyToCity(city, reducedMotion() || skipGlobe ? 0 : 2.4);
+            if(worldOnly){
+              map.flyTo([12, 20], 2, { duration: reducedMotion() ? 0.4 : 1.6, easeLinearity: 0.28 });
+            } else {
+              flyToCity(city, reducedMotion() || skipGlobe ? 0 : 2.4);
+            }
           }
           if(appEl) appEl.classList.remove('globe-focus');
           renderRoadmap();
@@ -838,9 +850,22 @@
   }
 
   window.openTerraRoadmap = openMap;
+  window.openTerraWorld = function(){ openMap('world', { world:true }); };
   window.closeTerraRoadmap = closeMap;
 
   if(location.hash === '#roadmap') setTimeout(openMap, 240);
+  if(location.hash === '#maps' || location.hash === '#world') setTimeout(function(){ openMap('world', { world:true }); }, 240);
+
+  var satPeek = document.getElementById('satPeek');
+  if(satPeek){
+    satPeek.addEventListener('click', function(){
+      if(window.GOO && GOO.Sound) GOO.Sound.click();
+      openMap('world', { world:true });
+    });
+    satPeek.querySelectorAll('img').forEach(function(img){
+      img.addEventListener('error', function(){ img.style.display = 'none'; });
+    });
+  }
 
   document.getElementById('terraClose').addEventListener('click', closeMap);
   document.getElementById('terraZoomIn').addEventListener('click', function(){ if(map) map.zoomIn(); });

@@ -422,6 +422,7 @@ document.addEventListener('pointerover', function(e){
     modal.classList.add('open');
   }
   window.openUxCard = openCard;
+  window.closeUxCard = closeCard;
 
   function closeLedgerSheet(){
     if (!ledgerSheet) return;
@@ -472,6 +473,13 @@ document.addEventListener('pointerover', function(e){
     tip.addEventListener('click', function(ev){
       ev.stopPropagation();
       openCard(tip.dataset.card);
+    });
+  });
+  document.querySelectorAll('.icon-btn').forEach(function(btn){
+    btn.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      var tip = btn.parentNode && btn.parentNode.querySelector('.icon-tip');
+      if(tip && tip.dataset.card) openCard(tip.dataset.card);
     });
   });
 
@@ -827,6 +835,7 @@ function close(){
   dTitle.style.opacity = '0';
   app.classList.remove('detail');
 }
+window.closePhotoCard = close;
 document.getElementById('back').addEventListener('click', close);
 addEventListener('keydown', function(e){
   if(e.key !== 'Escape') return;

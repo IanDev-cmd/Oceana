@@ -16,19 +16,21 @@ Then open `http://127.0.0.1:8765/`. Mobile / standalone sessions land on the PWA
 
 | Path | Role |
 | --- | --- |
-| `index.html` | Device-aware entry redirect. Desktop lands on `save-the-earth (4).html` (the live desktop URL); that filename is kept on purpose. |
-| `save-the-earth (4).html` | Desktop / embed shell (markup + styles) |
+| `index.html` | Device-aware entry redirect. Desktop lands on `desktop.html`. |
+| `desktop.html` | Desktop / embed shell (markup + styles) |
+| `save-the-earth (4).html` | Redirect stub to `desktop.html` (old bookmarks / PWA iframes) |
 | `js/boot.js` | Lazy-loads Three.js + Leaflet when globe/map are needed |
 | `js/goo-core.js` | Device, sound, notifications |
 | `js/goo-compass.js` | GPS heading, elevation, map-ring HUD |
 | `js/goo-shell.js` | Install, share, tutorial, service worker |
 | `js/goo-globe.js` | Three.js globe (hardware LOD, deferred GPU init) |
-| `js/goo-config.js` | Public Stripe API origin (`GOO_API`) |
-| `js/goo-stripe.js` | Checkout session create + live balances |
+| `js/api/config.js` | Public Stripe API origin (`GOO_API`) |
+| `js/api/client.js` | Only browser module that calls `/api/*` |
+| `js/api/wallet-ui.js` | Shared fund/personal painter + Checkout binder |
 | `js/goo-cards.js` | Sidebar cards and globe chrome |
-| `success.html` / `cart.html` | Stripe return pages |
+| `success.html` / `cancel.html` | Stripe return pages (`cart.html` redirects to cancel) |
 | `server/` | Express + Prisma Stripe API |
-| `stripe-ui/` | Typed React/Next.js Checkout copies |
+| `stripe-ui/CheckoutButton.tsx` | Typed Checkout button that posts to Express |
 | `js/goo-map.js` | Leaflet overlays and phase roadmap |
 | `js/pwa-app.js` | PWA clock and tile → 3D/2D loader |
 | `css/goo.css` | Shared chrome (toasts, compass, tutorial) |

@@ -14,11 +14,22 @@ enum OrderStatus {
   canceled
 }
 
+enum OrderKind {
+  payment
+  subscription_setup
+}
+
 enum SubscriptionStatus {
   pending
   active
   past_due
   canceled
+}
+
+enum StripeEventStatus {
+  received
+  processed
+  failed
 }
 
 model User {
@@ -42,6 +53,7 @@ model Order {
   stripePaymentIntentId String?     @map("stripe_payment_intent_id")
   amount                Int
   currency              String      @default("usd")
+  kind                  OrderKind   @default(payment)
   status                OrderStatus @default(pending)
   createdAt             DateTime    @default(now()) @map("created_at")
   updatedAt             DateTime    @updatedAt @map("updated_at")
@@ -49,6 +61,7 @@ model Order {
   @@index([userId])
   @@index([stripeSessionId])
   @@index([status])
+  @@index([kind, status])
   @@map("orders")
 }
 
@@ -70,9 +83,14 @@ model Subscription {
 }
 
 model StripeEvent {
-  id          String   @id
+  id          String            @id
   type        String
-  processedAt DateTime @default(now()) @map("processed_at")
+  status      StripeEventStatus @default(received)
+  attempts    Int               @default(0)
+  lastError   String?           @map("last_error")
+  processedAt DateTime?         @map("processed_at")
+  createdAt   DateTime          @default(now()) @map("created_at")
 
+  @@index([status])
   @@map("stripe_events")
 }

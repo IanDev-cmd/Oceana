@@ -82,22 +82,50 @@ body{ font-family:'Quicksand',sans-serif; }
 html, body, a, button, .card{ cursor:none; }
 .cursor{
   position:fixed; left:0; top:0; z-index:9999;
-  width:26px; height:26px; margin:-13px 0 0 -13px;
-  border:1.5px solid #3dff8a;
+  width:22px; height:22px; margin:-11px 0 0 -11px;
+  background:#16a34a;
+  border:2px solid #c8ffdc;
   border-radius:50%; pointer-events:none;
   will-change:transform;
+  box-shadow:
+    0 0 8px 2px rgba(61,255,138,.95),
+    0 0 20px 8px rgba(22,163,74,.55),
+    0 0 36px 16px rgba(61,255,138,.28);
   transition:width .18s ease, height .18s ease, margin .18s ease,
-             border-color .18s ease, background-color .18s ease;
+             background-color .18s ease, box-shadow .18s ease;
+}
+.cursor::before{
+  content:"";
+  position:absolute; inset:5px; border-radius:50%;
+  background:#eafff2;
+  box-shadow:0 0 6px rgba(255,255,255,.9);
+}
+.cursor::after{
+  content:"";
+  position:absolute; inset:-12px; border-radius:50%;
+  border:2px solid rgba(61,255,138,.5);
+  box-shadow:0 0 18px 6px rgba(61,255,138,.35);
+  animation:cursorGlow 1.5s ease-in-out infinite;
+  pointer-events:none;
 }
 .cursor.hot{
-  width:44px; height:44px; margin:-22px 0 0 -22px;
-  background:rgba(61,255,138,.14);
-  border-color:#1f9254;
+  width:34px; height:34px; margin:-17px 0 0 -17px;
+  background:#22c55e;
+  box-shadow:
+    0 0 12px 4px rgba(61,255,138,1),
+    0 0 28px 12px rgba(22,163,74,.65),
+    0 0 48px 20px rgba(61,255,138,.35);
 }
 .ripple{
   position:fixed; z-index:9998; width:26px; height:26px; margin:-13px 0 0 -13px;
-  border:1.5px solid #3dff8a; border-radius:50%;
+  border:2px solid #3dff8a; border-radius:50%;
+  background:rgba(22,163,74,.28);
+  box-shadow:0 0 16px 6px rgba(61,255,138,.45);
   pointer-events:none; animation:ripple .62s cubic-bezier(.2,.7,.3,1) forwards;
+}
+@keyframes cursorGlow{
+  0%,100%{ transform:scale(.82); opacity:.4; }
+  50%{ transform:scale(1.32); opacity:1; }
 }
 @keyframes ripple{
   0%  { transform:scale(1);   opacity:.95; }
@@ -589,6 +617,36 @@ button.uxrow{
 }
 .gctrl .compass-fab svg polygon{ fill:#12202c; stroke:none; }
 .gctrl button:active{ transform:scale(.94); }
+
+.sat-peek{
+  position:absolute; z-index:15;
+  left:var(--dock-left); bottom:calc(var(--dock-bottom) + var(--hud) + 14px + var(--hud) + 12px);
+  width:28px; height:28px;
+  padding:0; border:none; overflow:hidden;
+  border-radius:7px;
+  box-shadow:0 8px 18px rgba(0,16,40,.28), 0 0 0 1px rgba(255,255,255,.4);
+  background:#071820 url('assets/3d/earth-atmos.jpg') center/cover no-repeat;
+  -webkit-appearance:none; appearance:none;
+}
+.sat-peek-grid{
+  position:absolute; inset:0;
+  display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr;
+}
+.sat-peek-grid img{ width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
+.sat-peek-cap{ display:none; }
+.sat-peek-cap b{ display:block; font:700 11px/1.1 'Space Grotesk',sans-serif; letter-spacing:.08em; }
+.sat-peek-cap i{ display:block; font:600 9px/1.3 'JetBrains Mono',ui-monospace,monospace; letter-spacing:.08em; color:#7dffb0; margin-top:2px; font-style:normal; }
+.sat-peek::after{
+  content:""; position:absolute; inset:2px; z-index:1; pointer-events:none;
+  border:1px solid rgba(125,255,176,.45);
+  border-radius:5px;
+}
+.sat-peek:hover{ transform:translateY(-2px); }
+.sat-peek:active{ transform:scale(.97); }
+.app.detail .sat-peek,
+.app.globe-focus .sat-peek,
+body.terra-open .sat-peek{ opacity:0; pointer-events:none; }
+html.embed .sat-peek{ display:none; }
 .glayers{
   position:fixed; left:var(--dock-left); top:auto; bottom:calc(var(--dock-bottom) + (var(--hud) + 10px) * 2); z-index:17;
   display:none; min-width:180px; background:#fff; padding:6px;
@@ -1483,7 +1541,7 @@ html.embed .uxclose-pwa{ display:flex !important; }
     <div class="icons" id="icons">
       <div class="icon-group">
         <div class="icon-wrap">
-          <button class="icon-btn" type="button" aria-label="Wallet">
+          <button class="icon-btn" type="button" id="railWallet" aria-label="Wallet">
             <svg viewBox="0 0 24 24"><path d="M3 7.2C3 5.7 4.2 4.5 5.7 4.5H20.5v2.4H5.7a.7.7 0 0 0 0 1.4H21V19H5.7A2.7 2.7 0 0 1 3 16.3V7.2Zm14.6 6.1a1.35 1.35 0 1 0 0-2.7 1.35 1.35 0 0 0 0 2.7Z"/></svg>
           </button>
           <div class="icon-tip" data-card="wallet">
@@ -1492,7 +1550,7 @@ html.embed .uxclose-pwa{ display:flex !important; }
           </div>
         </div>
         <div class="icon-wrap">
-          <button class="icon-btn" type="button" aria-label="Milestone">
+          <button class="icon-btn" type="button" id="railMilestone" aria-label="Milestone">
             <svg viewBox="0 0 24 24"><path d="M7 22V3h.5L19 8.4 7.5 13.7H7V22h2.2v-6.4Z"/></svg>
           </button>
           <div class="icon-tip" data-card="milestone">
@@ -1519,6 +1577,7 @@ html.embed .uxclose-pwa{ display:flex !important; }
 
   <nav class="nav"><a href="#">About</a><a href="#">Contact</a></nav>
 
+  <div class="home-dock" id="homeDock">
   <div class="install-app" id="installApp">
     <button type="button" id="installMain">INSTALL APP</button>
     <button type="button" id="installApple" aria-label="Install on iPhone">
@@ -1527,6 +1586,7 @@ html.embed .uxclose-pwa{ display:flex !important; }
     <button type="button" id="installPlay" aria-label="Install on Android">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 2.8v18.4c0 .5.5.8 1 .6l10.2-9.2L4.5 2.2c-.5-.2-1 .1-1 .6zm12.3 7.3 2.2-2-8.3-4.8 6.1 6.8zm2.2 5.8-2.2-2-6.1 6.8 8.3-4.8zM8.4 12 4.8 15.6V8.4L8.4 12z"/></svg>
     </button>
+  </div>
   </div>
 
   <div class="globe-wrap" id="globeWrap">
@@ -1553,6 +1613,15 @@ html.embed .uxclose-pwa{ display:flex !important; }
       <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
     </button>
   </div>
+  <button type="button" class="sat-peek" id="satPeek" aria-label="Open satellite 2D maps">
+    <span class="sat-peek-grid" aria-hidden="true">
+      <img src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/1/0/0" alt="" width="256" height="256" decoding="async">
+      <img src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/1/0/1" alt="" width="256" height="256" decoding="async">
+      <img src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/1/1/0" alt="" width="256" height="256" decoding="async">
+      <img src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/1/1/1" alt="" width="256" height="256" decoding="async">
+    </span>
+    <span class="sat-peek-cap"><b>SATELLITE</b><i>2D MAPS</i></span>
+  </button>
   <div class="glayers" id="gLayersPanel">
     <button type="button" class="selected" data-tex="default"><span><b>Daylight</b><i>TRUE-COLOR EARTH</i></span></button>
     <button type="button" data-tex="night"><span><b>Night lights</b><i>CITY GLOW</i></span></button>

@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
-import { HttpError } from "./http.js";
-import type { Env } from "./env.js";
+import { HttpError } from "../http.js";
+import type { Env } from "../env.js";
 
 export function requireCheckoutAuth(env: Env) {
   return (req: Request, _res: Response, next: NextFunction): void => {

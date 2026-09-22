@@ -187,5 +187,16 @@
     grid.appendChild(btn);
   });
 
+  var satPeek = document.getElementById('satPeek');
+  if (satPeek) {
+    satPeek.addEventListener('click', function () {
+      if (Sound) Sound.click();
+      openWebView('world');
+    });
+    satPeek.querySelectorAll('img').forEach(function (img) {
+      img.addEventListener('error', function () { img.style.display = 'none'; });
+    });
+  }
+
   bindPay();
 })();

@@ -1,8 +1,9 @@
-const CACHE_NAME = 'guardians-ocean-v29';
+const CACHE_NAME = 'guardians-ocean-v32';
 const ASSETS = [
   './',
   './index.html',
   './desktop.html',
+  './install.html',
   './save-the-earth (4).html',
   './success.html',
   './cart.html',
