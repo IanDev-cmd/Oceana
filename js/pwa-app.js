@@ -25,27 +25,27 @@
   if (typeof window.fitGooPwa === 'function') window.fitGooPwa();
 
   var ICONS = [
-    { id:'globe', label:'3D Earth', svg:'<circle cx="12" cy="12" r="9" stroke-width="1.4"/><ellipse cx="12" cy="12" rx="4" ry="9" stroke-width="1.4"/><path d="M3 12h18" stroke-width="1.4"/>',
+    { id:'globe', hue:'#84c02c', label:'3D Earth', svg:'<circle cx="12" cy="12" r="9" stroke-width="1.6"/><ellipse cx="12" cy="12" rx="4" ry="9" stroke-width="1.6"/><path d="M3 12h18" stroke-width="1.6"/>',
       card:{ rank:'00', title:'3D EARTH', sub:'Immersive globe desk', badge:'LIVE', kpis:[{n:'3D',l:'GLOBE'},{n:'10',l:'CITIES'},{n:'LIVE',l:'SPIN'}], fund:'Step into the full Earth desk — spin the planet, search coasts, and walk every node.', ctas:[{id:'immerse', label:'IMMERSE', view:'globe'},{id:'hash', label:'2D MAPS', cls:'hash', view:'world'}] } },
-    { id:'audit', label:'Verified Audit Trail', svg:'<path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3Z" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>',
+    { id:'audit', hue:'#2563eb', label:'Verified Audit Trail', svg:'<path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3Z" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
       card:{ rank:'01', title:'VERIFIED AUDIT', sub:'Hedera consensus', badge:'LIVE', kpis:[{n:'100%',l:'IMMUTABLE'},{n:'48.2k',l:'CHECKS'},{n:'3.2s',l:'FINALITY'}], fund:'On-chain state proofs across 8 countries', ctas:[{id:'openMap', label:'OPEN MAP', view:'map'},{id:'hash', label:'HASHSCAN', cls:'hash', view:'map'}] } },
-    { id:'vault', label:'Secure Asset Vault', svg:'<rect x="5" y="11" width="14" height="9" rx="2" stroke-width="1.4"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke-width="1.4"/><circle cx="12" cy="15.5" r="1.2" stroke-width="1.4"/>',
-      card:{ rank:'02', title:'SECURE VAULT', sub:'Multi-sig reserve', badge:'DEMO', kpis:[{n:'—',l:'TVL'},{n:'3',l:'VAULTS'},{n:'2/3',l:'SIGNERS'}], fund:'Demo tile — not live Stripe balances', ctas:[{id:'openWallet', label:'WALLET', view:'wallet'},{id:'hash', label:'ACCESS LOG', cls:'hash', view:'wallet'}] } },
-    { id:'roadmap', label:'2D Coastal Maps', svg:'<path d="M4 18c3-6 6-2 9-8 2-4 4-4 7-4" stroke-width="1.4" stroke-linecap="round"/><circle cx="4" cy="18" r="1.2" stroke-width="1.4"/><circle cx="20" cy="6" r="1.2" stroke-width="1.4"/>', open:'map' },
-    { id:'proof', label:'Proof of Execution', svg:'<path d="M6 3h12v17l-2-1.3-2 1.3-2-1.3-2 1.3-2-1.3-2 1.3V3Z" stroke-width="1.3" stroke-linejoin="round"/><path d="M8.5 8h7M8.5 11.5h7M8.5 15h4" stroke-width="1.3" stroke-linecap="round"/>',
+    { id:'wallet', hue:'#16a34a', label:'Wallet', svg:'<path d="M12 3v18" stroke-width="1.8" stroke-linecap="round"/><path d="M16.3 7.2c0-2-1.9-3.4-4.3-3.4S7.7 5.2 7.7 7.4c0 4.2 8.6 2.6 8.6 7 0 2.1-1.9 3.4-4.3 3.4s-4.3-1.3-4.3-3.3" stroke-width="1.8" stroke-linecap="round"/>',
+      card:{ rank:'02', title:'WALLET', sub:'Ocean cleaning fund', badge:'$', kpis:[{n:'10.0',l:'TOKEN'},{n:'85/15',l:'SPLIT'},{n:'LIVE',l:'LEDGER'}], fund:'Welcome token and Stripe payouts for ocean cleaning activities.', ctas:[{id:'openWallet', label:'OPEN WALLET', view:'wallet'},{id:'hash', label:'LEDGER', cls:'hash', view:'wallet'}] } },
+    { id:'roadmap', hue:'#0ea5e9', label:'2D Coastal Maps', svg:'<path d="M4 18c3-6 6-2 9-8 2-4 4-4 7-4" stroke-width="1.6" stroke-linecap="round"/><circle cx="4" cy="18" r="1.3" stroke-width="1.6"/><circle cx="20" cy="6" r="1.3" stroke-width="1.6"/>', open:'map' },
+    { id:'proof', hue:'#a855f7', label:'Proof of Execution', svg:'<path d="M6 3h12v17l-2-1.3-2 1.3-2-1.3-2 1.3-2-1.3-2 1.3V3Z" stroke-width="1.5" stroke-linejoin="round"/><path d="M8.5 8h7M8.5 11.5h7M8.5 15h4" stroke-width="1.5" stroke-linecap="round"/>',
       card:{ rank:'04', title:'PROOF OF EXECUTION', sub:'Downloadable records', badge:'PDF', kpis:[{n:'12.4k',l:'RECORDS'},{n:'HCS',l:'HASHED'},{n:'100%',l:'LINKED'}], fund:'Each PDF carries a live Hedera transaction hash', ctas:[{id:'openMap', label:'OPEN MAP', view:'map'},{id:'hash', label:'RECEIPTS', cls:'hash', view:'map'}] } },
-    { id:'trees', label:'Reforestation Hub', svg:'<path d="M12 21c-4-2-7-6-7-10a7 7 0 0 1 14 0c0 4-3 8-7 10Z" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 21V9" stroke-width="1.4" stroke-linecap="round"/>',
+    { id:'trees', hue:'#65a30d', label:'Reforestation Hub', svg:'<path d="M12 21c-4-2-7-6-7-10a7 7 0 0 1 14 0c0 4-3 8-7 10Z" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 21V9" stroke-width="1.6" stroke-linecap="round"/>',
       card:{ rank:'05', title:'REFORESTATION HUB', sub:'Canopy restoration', badge:'GROW', kpis:[{n:'450k',l:'TREES'},{n:'9.8kt',l:'CO₂'},{n:'24km',l:'EDGE'}], fund:'Delta sediment & vegetation replanting', ctas:[{id:'openMap', label:'OPEN MAP', view:'map'},{id:'hash', label:'SITES', cls:'hash', view:'globe'}] } },
-    { id:'bio', label:'Biodiversity Guard', svg:'<path d="M2 13c3-3.5 6-3.5 8 0 2-3.5 5-3.5 8 0" stroke-width="1.4" stroke-linecap="round"/><path d="M10 13v6" stroke-width="1.4" stroke-linecap="round"/>',
+    { id:'bio', hue:'#f59e0b', label:'Biodiversity Guard', svg:'<path d="M2 13c3-3.5 6-3.5 8 0 2-3.5 5-3.5 8 0" stroke-width="1.6" stroke-linecap="round"/><path d="M10 13v6" stroke-width="1.6" stroke-linecap="round"/>',
       card:{ rank:'06', title:'BIODIVERSITY GUARD', sub:'Sanctuary watch', badge:'128', kpis:[{n:'128',l:'SPECIES'},{n:'35k',l:'HA'},{n:'18',l:'DRONE'}], fund:'Protected species across sanctuary land', ctas:[{id:'openMap', label:'OPEN MAP', view:'map'},{id:'hash', label:'SANCTUARY', cls:'hash', view:'globe'}] } },
-    { id:'ocean', label:'Ocean & Basin Care', svg:'<path d="M12 3c4 5 6 8 6 11a6 6 0 0 1-12 0c0-3 2-6 6-11Z" stroke-width="1.4" stroke-linejoin="round"/>',
+    { id:'ocean', hue:'#0284c7', label:'Ocean & Basin Care', svg:'<path d="M12 3c4 5 6 8 6 11a6 6 0 0 1-12 0c0-3 2-6 6-11Z" stroke-width="1.6" stroke-linejoin="round"/>',
       card:{ rank:'07', title:'OCEAN & BASIN CARE', sub:'Marine restoration', badge:'SEA', kpis:[{n:'85t',l:'WASTE'},{n:'14',l:'SITES'},{n:'310t',l:'PLASTIC'}], fund:'Coastal waste removed across 14 marine sites', ctas:[{id:'openMap', label:'OPEN MAP', view:'map'},{id:'hash', label:'COASTS', cls:'hash', view:'map'}] } },
-    { id:'energy', label:'Clean Energy Grid', svg:'<circle cx="12" cy="12" r="4" stroke-width="1.4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M4.5 19.5l2-2M17.5 6.5l2-2" stroke-width="1.4" stroke-linecap="round"/>',
+    { id:'energy', hue:'#eab308', label:'Clean Energy Grid', svg:'<circle cx="12" cy="12" r="4" stroke-width="1.6"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M4.5 19.5l2-2M17.5 6.5l2-2" stroke-width="1.6" stroke-linecap="round"/>',
       card:{ rank:'08', title:'CLEAN ENERGY GRID', sub:'Solar field stations', badge:'3.2', kpis:[{n:'3.2',l:'GWH'},{n:'1.4k',l:'MWH'},{n:'99.2%',l:'UPTIME'}], fund:'Tokenized surplus as energy credits', ctas:[{id:'openMap', label:'OPEN MAP', view:'map'},{id:'hash', label:'GRID', cls:'hash', view:'globe'}] } },
-    { id:'treasury', label:'Fiat & Token Treasury', svg:'<path d="M4 9V7a2 2 0 0 1 2-2h9" stroke-width="1.4" stroke-linecap="round"/><path d="M4 8a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z" stroke-width="1.4" stroke-linejoin="round"/><circle cx="16.3" cy="12.5" r="0.9" stroke-width="1.4"/>', pay:true },
-    { id:'grants', label:'Grants & Micro-Stipends', svg:'<path d="M3 12l4-4 3 2 3-2 4 4-2 2-2-1-2 2-2-1-2 1-2-2Z" stroke-width="1.3" stroke-linejoin="round"/>',
+    { id:'treasury', hue:'#f97316', label:'Fiat & Token Treasury', svg:'<path d="M4 9V7a2 2 0 0 1 2-2h9" stroke-width="1.6" stroke-linecap="round"/><path d="M4 8a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16.3" cy="12.5" r="0.9" stroke-width="1.6"/>', pay:true },
+    { id:'grants', hue:'#ec4899', label:'Grants & Micro-Stipends', svg:'<path d="M3 12l4-4 3 2 3-2 4 4-2 2-2-1-2 2-2-1-2 1-2-2Z" stroke-width="1.5" stroke-linejoin="round"/>',
       card:{ rank:'10', title:'GRANTS & STIPENDS', sub:'Field operators', badge:'DEMO', kpis:[{n:'—',l:'PAID'},{n:'320',l:'OPS'},{n:'85%',l:'FIELD'}], fund:'Demo tile — live payouts are on the treasury card', ctas:[{id:'openWallet', label:'WALLET', view:'wallet'},{id:'hash', label:'MILESTONE', cls:'hash', view:'milestone'}] } },
-    { id:'hashscan', label:'On-Chain HashScan', svg:'<path d="M14 4h6v6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4l-9 9" stroke-width="1.4" stroke-linecap="round"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>',
+    { id:'hashscan', hue:'#6366f1', label:'On-Chain HashScan', svg:'<path d="M14 4h6v6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4l-9 9" stroke-width="1.6" stroke-linecap="round"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
       card:{ rank:'11', title:'ON-CHAIN HASHSCAN', sub:'Network explorer', badge:'HCS', kpis:[{n:'3.2s',l:'FINALITY'},{n:'#58.2M',l:'BLOCK'},{n:'0.001',l:'HBAR'}], fund:'Average network fee on mirrored proofs', ctas:[{id:'openMap', label:'OPEN MAP', view:'map'},{id:'hash', label:'EXPLORER', cls:'hash', view:'map'}] } }
   ];
 
@@ -172,8 +172,9 @@
 
   ICONS.forEach(function (item, i) {
     var btn = document.createElement('button');
-    btn.className = 'tile' + (item.id === 'globe' ? ' active glow' : '');
+    btn.className = 'tile vivid' + (item.id === 'globe' ? ' active glow' : '');
     btn.setAttribute('aria-label', item.label);
+    if (item.hue) btn.style.setProperty('--tile-hue', item.hue);
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none">' + item.svg + '</svg>';
     btn.addEventListener('click', function () {
       grid.querySelectorAll('.tile').forEach(function (t) { t.classList.remove('active', 'glow'); });

@@ -806,6 +806,7 @@
       overlay.setAttribute('aria-hidden','false');
       overlay.removeAttribute('inert');
       document.body.classList.add('terra-open');
+      maybeWelcomeToken();
       leafletReady.then(function(){
         if(!window.L) return;
         initMap();
@@ -852,6 +853,51 @@
   window.openTerraRoadmap = openMap;
   window.openTerraWorld = function(){ openMap('world', { world:true }); };
   window.closeTerraRoadmap = closeMap;
+
+  var WELCOME_KEY = 'goo-welcome-token-v1';
+  function maybeWelcomeToken() {
+    if (document.body.classList.contains('tut-on')) return;
+    try { if (localStorage.getItem(WELCOME_KEY) === '1') return; } catch (e) {}
+    if (document.getElementById('welcomeToken')) return;
+    var wrap = document.createElement('div');
+    wrap.id = 'welcomeToken';
+    wrap.className = 'welcome-ask';
+    var nums = [];
+    var i;
+    for (i = 0; i <= 100; i += 5) nums.push((i / 10).toFixed(1));
+    wrap.innerHTML =
+      '<article class="welcome-card" role="dialog" aria-label="Welcome token">' +
+        '<button type="button" class="welcome-x" id="welcomeClose" aria-label="Close">' +
+          '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+        '</button>' +
+        '<div class="welcome-h tpop-h"><span class="rank tpop-rank">$</span><div><b>WELCOME TOKEN</b><i>Ocean cleaning fund</i></div><span class="tpop-ph">NEW</span></div>' +
+        '<p class="welcome-copy">You have received <b>10.0 $</b> as a welcome token Funding for Ocean Cleaning Activities</p>' +
+        '<div class="welcome-amt"><span class="welcome-cur">$</span><span class="welcome-reel"><span class="welcome-track" id="welcomeTrack">' +
+          nums.map(function (n) { return '<b>' + n + '</b>'; }).join('') +
+        '</span></span></div>' +
+        '<p class="welcome-fund">Success · ledger credit posted</p>' +
+        '<span class="welcome-burst" id="welcomeBurst" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></span>' +
+      '</article>';
+    document.body.appendChild(wrap);
+    var track = wrap.querySelector('#welcomeTrack');
+    var burst = wrap.querySelector('#welcomeBurst');
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        var last = track.querySelector('b:last-child');
+        var y = last ? last.offsetTop : 0;
+        track.style.transform = 'translateY(-' + y + 'px)';
+      });
+    });
+    setTimeout(function () {
+      if (burst) burst.classList.add('on');
+      if (window.GOO && GOO.Sound) GOO.Sound.success();
+    }, 2400);
+    function dismiss() {
+      try { localStorage.setItem(WELCOME_KEY, '1'); } catch (e) {}
+      wrap.remove();
+    }
+    wrap.querySelector('#welcomeClose').addEventListener('click', dismiss);
+  }
 
   if(location.hash === '#roadmap') setTimeout(openMap, 240);
   if(location.hash === '#maps' || location.hash === '#world') setTimeout(function(){ openMap('world', { world:true }); }, 240);

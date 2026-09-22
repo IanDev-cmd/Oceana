@@ -252,31 +252,8 @@
         Notify.toast({ tone: 'amber', title: 'Offline', sub: 'Cached maps stay available.', n: '!' });
       });
     },
-    toast: function (opts) {
-      this.ensure();
-      opts = opts || {};
-      var tone = opts.tone || 'blue';
-      if (tone === 'green') Sound.success();
-      else if (tone === 'amber') Sound.warn();
-      else Sound.info();
-      var num = opts.n != null ? String(opts.n) : String(this.items.length + 1).padStart(2, '0');
-      var iconHtml = opts.icon
-        ? '<span class="n-ico n-ico-src" aria-hidden="true"><img class="n-src" alt="" src="' + esc(opts.icon) + '" width="18" height="18"></span>'
-        : '<span class="n-ico" aria-hidden="true">🔔</span>';
-      var el = document.createElement('div');
-      el.className = 'n-toast tone-' + tone;
-      el.innerHTML =
-        '<span class="n-dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
-        '<span class="n-num">' + esc(num) + '</span>' +
-        '<span class="n-copy"><b>' + esc(opts.title || 'Notice') + '</b><i>' + esc(opts.sub || '') + '</i></span>' +
-        iconHtml;
-      this.stack.appendChild(el);
-      requestAnimationFrame(function () { el.classList.add('show'); });
-      this.items.unshift({ tone: tone, title: opts.title, sub: opts.sub, t: Date.now() });
-      setTimeout(function () {
-        el.classList.remove('show');
-        setTimeout(function () { if (el.parentNode) el.remove(); }, 380);
-      }, opts.hold || 3200);
+    toast: function () {
+      return;
     }
   };
 
